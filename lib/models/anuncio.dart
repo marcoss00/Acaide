@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'cidade.dart';
 
 class Anuncio {
   final String titulo;
@@ -6,10 +7,10 @@ class Anuncio {
   final int quant_telas;
   final bool entrega;
   final double preco;
-  final int regiao;
+  final List<Cidade> cidades;
   final File imagem;
   final String descricao;
 
   Anuncio(this.titulo, this.tipo_anunciante, this.entrega, this.preco,
-      this.regiao, this.imagem, this.quant_telas, this.descricao);
+      this.cidades, this.imagem, this.quant_telas, this.descricao);
 }

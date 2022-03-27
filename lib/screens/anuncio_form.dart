@@ -1,213 +1,222 @@
+import 'package:acaide/models/cidade.dart';
+import 'package:acaide/models/cidades.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 import 'dart:io';
-
+import 'package:image_picker/image_picker.dart';
+import 'package:multi_select_flutter/multi_select_flutter.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-enum TipoAnunciante { produtor, revendedor }
-
-File? foto_anuncio;
+File? _fotoAnuncio;
+final Cidades _cidades = Cidades();
 
 class AnuncioForm extends StatefulWidget {
   const AnuncioForm({Key? key}) : super(key: key);
 
   @override
-  _AnuncioFormState createState() => _AnuncioFormState();
+  State<AnuncioForm> createState() => _AnuncioFormState();
 }
 
 class _AnuncioFormState extends State<AnuncioForm> {
-  TipoAnunciante? _padrao_anunciante = TipoAnunciante.produtor;
+  Color top_color = Colors.purple[800]!;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.purple[800],
       appBar: AppBar(
         backgroundColor: Colors.purple[800],
         title: Text(
           "Inserir anúncio",
           style: TextStyle(
-            fontFamily: "PTSans",
-            fontSize: 23.0,
+            fontFamily: "Cookie",
+            fontSize: 28.0,
           ),
         ),
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Form(
-              child: Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: ImagemAnuncio(),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.all(32.0),
-                    child: TextFormField(
-                      controller: TextEditingController(),
-                      style: TextStyle(),
-                      decoration: InputDecoration(
-                        fillColor: Colors.white,
-                        labelText: 'Título do anúncio*',
-                        labelStyle: TextStyle(
-                          fontSize: 20.0,
-                          color: Colors.grey,
+      body: Container(
+        padding: EdgeInsets.symmetric(
+          horizontal: 50,
+          vertical: 30,
+        ),
+        height: MediaQuery.of(context).size.height,
+        width: MediaQuery.of(context).size.width,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              //Color.fromARGB(255, 255, 110, 255),
+              Colors.purple[800]!,
+              top_color,
+            ],
+          ),
+        ),
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              Form(
+                child: Column(
+                  children: [
+                    FotoAnuncio(),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 20.0),
+                      child: TextFormField(
+                        keyboardType: TextInputType.text,
+                        style: TextStyle(
+                          color: Colors.white,
                         ),
-                        filled: true,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(25.0),
-                        ),
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.only(left: 32.0, right: 32.0, bottom: 32.0),
-                    child: TextFormField(
-                      controller: TextEditingController(),
-                      style: TextStyle(),
-                      decoration: InputDecoration(
-                        fillColor: Colors.white,
-                        labelText: 'Descrição*',
-                        labelStyle: TextStyle(
-                          fontSize: 20.0,
-                          color: Colors.grey,
-                        ),
-                        filled: true,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(25.0),
-                        ),
-                      ),
-                    ),
-                  ),
-                  Column(
-                    children: [
-                      RadioListTile<TipoAnunciante>(
-                        activeColor: Colors.green,
-                        tileColor: Colors.white,
-                        title: Text('Região A'),
-                        value: TipoAnunciante.produtor,
-                        groupValue: _padrao_anunciante,
-                        onChanged: (TipoAnunciante? value) {
-                          setState(() {
-                            _padrao_anunciante = value;
-                          });
-                        },
-                      ),
-                      RadioListTile<TipoAnunciante>(
-                        activeColor: Colors.green,
-                        tileColor: Colors.white,
-                        title: Text('Região B'),
-                        value: TipoAnunciante.revendedor,
-                        groupValue: _padrao_anunciante,
-                        onChanged: (TipoAnunciante? value) {
-                          setState(() {
-                            _padrao_anunciante = value;
-                          });
-                        },
-                      ),
-                    ],
-                  ),
-                  Column(
-                    children: [
-                      RadioListTile<TipoAnunciante>(
-                        activeColor: Colors.green,
-                        tileColor: Colors.white,
-                        title: Text('Produtor'),
-                        value: TipoAnunciante.produtor,
-                        groupValue: _padrao_anunciante,
-                        onChanged: (TipoAnunciante? value) {
-                          setState(() {
-                            _padrao_anunciante = value;
-                          });
-                        },
-                      ),
-                      RadioListTile<TipoAnunciante>(
-                        activeColor: Colors.green,
-                        tileColor: Colors.white,
-                        title: Text('Revendedor'),
-                        value: TipoAnunciante.revendedor,
-                        groupValue: _padrao_anunciante,
-                        onChanged: (TipoAnunciante? value) {
-                          setState(() {
-                            _padrao_anunciante = value;
-                          });
-                        },
-                      ),
-                    ],
-                  ),
-                  Column(
-                    children: [
-                      RadioListTile<TipoAnunciante>(
-                        activeColor: Colors.green,
-                        tileColor: Colors.white,
-                        title: Text('Entrega'),
-                        value: TipoAnunciante.produtor,
-                        groupValue: _padrao_anunciante,
-                        onChanged: (TipoAnunciante? value) {
-                          setState(() {
-                            _padrao_anunciante = value;
-                          });
-                        },
-                      ),
-                      RadioListTile<TipoAnunciante>(
-                        activeColor: Colors.green,
-                        tileColor: Colors.white,
-                        title: Text('Não Entrega'),
-                        value: TipoAnunciante.revendedor,
-                        groupValue: _padrao_anunciante,
-                        onChanged: (TipoAnunciante? value) {
-                          setState(() {
-                            _padrao_anunciante = value;
-                          });
-                        },
-                      ),
-                    ],
-                  ),
-                  Padding(
-                    padding: EdgeInsets.only(left: 32.0, right: 32.0, bottom: 32.0),
-                    child: TextFormField(
-                      controller: TextEditingController(),
-                      style: TextStyle(),
-                      decoration: InputDecoration(
-                        fillColor: Colors.white,
-                        labelText: 'Quantidade de Telas de Açaí',
-                        labelStyle: TextStyle(
-                          fontSize: 20.0,
-                          color: Colors.grey,
-                        ),
-                        filled: true,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(25.0),
+                        autofocus: true,
+                        decoration: InputDecoration(
+                          counterText: "0/20",
+                          counterStyle: TextStyle(color: Colors.white),
+                          hintText: "Ex: Açaí do Branco",
+                          hintStyle: TextStyle(color: Colors.white),
+                          labelText: "Título do anúncio*",
+                          labelStyle: TextStyle(
+                            color: Colors.white,
+                          ),
+                          prefixIcon: Icon(
+                            Icons.title,
+                            color: Colors.white,
+                          ),
+                          focusedBorder: UnderlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Colors.white,
+                            ),
+                          ),
+                          enabledBorder: UnderlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Colors.white,
+                            ),
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.only(left: 32.0, right: 32.0, bottom: 32.0),
-                    child: TextFormField(
-                      controller: TextEditingController(),
-                      style: TextStyle(),
-                      decoration: InputDecoration(
-                        fillColor: Colors.white,
-                        labelText: 'Preço da Tela de Açaí',
-                        labelStyle: TextStyle(
-                          fontSize: 20.0,
-                          color: Colors.grey,
+                    Padding(
+                      padding: const EdgeInsets.only(top: 10.0),
+                      child: TextFormField(
+                        keyboardType: TextInputType.text,
+                        style: TextStyle(
+                          color: Colors.white,
                         ),
-                        filled: true,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(25.0),
+                        autofocus: true,
+                        decoration: InputDecoration(
+                          counterText: "0/100",
+                          counterStyle: TextStyle(color: Colors.white),
+                          hintText:
+                              "Ex: Açaí de excelente qualidade, produzido na região... Entre em contato para mais informações",
+                          hintStyle: TextStyle(color: Colors.white),
+                          labelText: "Descrição*",
+                          labelStyle: TextStyle(
+                            color: Colors.white,
+                          ),
+                          prefixIcon: Icon(
+                            Icons.description,
+                            color: Colors.white,
+                          ),
+                          focusedBorder: UnderlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Colors.white,
+                            ),
+                          ),
+                          enabledBorder: UnderlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Colors.white,
+                            ),
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                ],
+                    Padding(
+                      padding: const EdgeInsets.only(top: 20.0),
+                      child: EntregaRadio(),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 20.0),
+                      child: TipoAnuncianteRadio(),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 20),
+                      child: TextFormField(
+                        keyboardType: TextInputType.number,
+                        style: TextStyle(
+                          color: Colors.white,
+                        ),
+                        autofocus: true,
+                        decoration: InputDecoration(
+                          hintText: "Ex: 13",
+                          hintStyle: TextStyle(color: Colors.white),
+                          labelText: "Quantidade de Telas*",
+                          labelStyle: TextStyle(
+                            color: Colors.white,
+                          ),
+                          prefixIcon: Icon(
+                            Icons.production_quantity_limits_outlined,
+                            color: Colors.white,
+                          ),
+                          focusedBorder: UnderlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Colors.white,
+                            ),
+                          ),
+                          enabledBorder: UnderlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 20),
+                      child: TextFormField(
+                        keyboardType: TextInputType.number,
+                        style: TextStyle(
+                          color: Colors.white,
+                        ),
+                        autofocus: true,
+                        decoration: InputDecoration(
+                          hintText: "Ex: R\$ 90,00",
+                          hintStyle: TextStyle(color: Colors.white),
+                          labelText: "Preço da Tela*",
+                          labelStyle: TextStyle(
+                            color: Colors.white,
+                          ),
+                          prefixIcon: Icon(
+                            Icons.price_change,
+                            color: Colors.white,
+                          ),
+                          focusedBorder: UnderlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Colors.white,
+                            ),
+                          ),
+                          enabledBorder: UnderlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding:
+                          const EdgeInsets.only(bottom: 20, top: 30, left: 12),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.location_city,
+                            color: Colors.white,
+                          ),
+                          Expanded(
+                            child: CidadeDropdown(),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(top: 20),
-              child: Container(
+              Container(
                 width: 500,
                 child: ElevatedButton(
                   onPressed: () {},
@@ -228,51 +237,40 @@ class _AnuncioFormState extends State<AnuncioForm> {
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
   }
 }
 
-class ImagemAnuncio extends StatefulWidget {
-  const ImagemAnuncio({Key? key}) : super(key: key);
+class FotoAnuncio extends StatefulWidget {
+  const FotoAnuncio({Key? key}) : super(key: key);
 
   @override
-  State<ImagemAnuncio> createState() => _ImagemAnuncioState();
+  State<FotoAnuncio> createState() => _FotoAnuncioState();
 }
 
-class _ImagemAnuncioState extends State<ImagemAnuncio> {
+class _FotoAnuncioState extends State<FotoAnuncio> {
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: foto_anuncio == null
-          ? Material(
-              child: InkWell(
-                onTap: () {
-                  _modalBottomSheet(context);
-                },
-                child: Container(
-                  color: Colors.white,
-                  width: 250,
-                  height: 250,
-                  child: Icon(
-                    Icons.camera_alt,
-                    size: 200,
-                    color: Colors.grey,
-                  ),
+    return InkWell(
+      onTap: () => _modalBottomSheet(context),
+      child: Center(
+        child: (_fotoAnuncio == null)
+            ? Container(
+                color: Colors.white,
+                width: 250,
+                height: 250,
+                child: Icon(
+                  Icons.camera_alt,
+                  size: 200,
+                  color: Colors.grey,
                 ),
-              ),
-            )
-          : Material(
-              child: InkWell(
-                onTap: () {
-                  _modalBottomSheet(context);
-                },
-                child: Image.file(foto_anuncio!),
-              ),
-            ),
+              )
+            : Image.file(_fotoAnuncio!),
+      ),
     );
   }
 
@@ -282,17 +280,50 @@ class _ImagemAnuncioState extends State<ImagemAnuncio> {
       context: context,
       builder: (BuildContext context) {
         return Container(
-          child: Wrap(
+          height: 100,
+          width: MediaQuery.of(context).size.width,
+          margin: EdgeInsets.symmetric(
+            horizontal: 20,
+            vertical: 20,
+          ),
+          child: Column(
             children: [
-              ListTile(
-                leading: Icon(Icons.camera_alt),
-                title: Text('Tirar foto'),
-                onTap: () => _checkPermissionCamera(),
+              Text(
+                "Escolha uma foto para o anúncio",
+                style: TextStyle(fontSize: 20.0),
               ),
-              ListTile(
-                leading: Icon(Icons.wallpaper_outlined),
-                title: Text('Escolher existente...'),
-                onTap: () => _checkPermissionGallery(),
+              Padding(
+                padding: const EdgeInsets.only(top: 20),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(right: 20),
+                      child: TextButton.icon(
+                        onPressed: () => _checkPermissionCamera(),
+                        icon: Icon(
+                          Icons.camera,
+                          color: Colors.black,
+                        ),
+                        label: Text(
+                          "Câmera",
+                          style: TextStyle(color: Colors.black),
+                        ),
+                      ),
+                    ),
+                    TextButton.icon(
+                      onPressed: () => _checkPermissionGallery(),
+                      icon: Icon(
+                        Icons.image,
+                        color: Colors.black,
+                      ),
+                      label: Text(
+                        "Galeria",
+                        style: TextStyle(color: Colors.black),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
@@ -307,7 +338,7 @@ class _ImagemAnuncioState extends State<ImagemAnuncio> {
     );
     if (pickedFile != null) {
       setState(() {
-        foto_anuncio = File(pickedFile.path);
+        _fotoAnuncio = File(pickedFile.path);
       });
     }
   }
@@ -318,7 +349,7 @@ class _ImagemAnuncioState extends State<ImagemAnuncio> {
     );
     if (pickedFile != null) {
       setState(() {
-        foto_anuncio = File(pickedFile.path);
+        _fotoAnuncio = File(pickedFile.path);
       });
     }
   }
@@ -346,5 +377,183 @@ class _ImagemAnuncioState extends State<ImagemAnuncio> {
     if (await Permission.storage.isGranted) {
       _getFromGallery();
     }
+  }
+}
+
+class CidadeDropdown extends StatefulWidget {
+  const CidadeDropdown({Key? key}) : super(key: key);
+
+  @override
+  State<CidadeDropdown> createState() => _CidadeDropdownState();
+}
+
+class _CidadeDropdownState extends State<CidadeDropdown> {
+  List<Object?> _cidadesSelecionadas = [];
+  final _itens = _cidades.cidadesList
+      .map((cidade) => MultiSelectItem<Cidade>(cidade, cidade.name!))
+      .toList();
+
+  @override
+  Widget build(BuildContext context) {
+    return MultiSelectBottomSheetField(
+      decoration: BoxDecoration(
+        color: Colors.purple[800],
+        borderRadius: BorderRadius.all(Radius.circular(40)),
+        border: Border.all(
+          color: Colors.green,
+          width: 2,
+        ),
+      ),
+      buttonIcon: Icon(
+        null,
+        color: Colors.white,
+      ),
+      buttonText: Text(
+        "Municípios*",
+        style: TextStyle(
+          fontSize: 17,
+          color: Colors.white,
+        ),
+      ),
+      searchable: true,
+      items: _itens,
+      separateSelectedItems: true,
+      title: Text("Municípios:"),
+      selectedColor: Colors.purple,
+      onConfirm: (resultado) {
+        _cidadesSelecionadas = resultado;
+      },
+      searchIcon: Icon(Icons.search),
+      selectedItemsTextStyle: TextStyle(color: Colors.green),
+      chipDisplay: MultiSelectChipDisplay(
+        scroll: true,
+        chipColor: Colors.green,
+        textStyle: TextStyle(color: Colors.white),
+      ),
+    );
+  }
+}
+
+class EntregaRadio extends StatefulWidget {
+  const EntregaRadio({Key? key}) : super(key: key);
+
+  @override
+  State<EntregaRadio> createState() => _EntregaRadioState();
+}
+
+enum FazEntrega { entrega, naoEntrega }
+
+class _EntregaRadioState extends State<EntregaRadio> {
+  FazEntrega fazEntrega = FazEntrega.naoEntrega;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(40),
+        border: Border.all(
+          color: Colors.white,
+          width: 4,
+        ),
+      ),
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(top: 10),
+            child: Text("Entrega:", style: TextStyle(color: Colors.white, fontSize: 20),),
+          ),
+          RadioListTile<FazEntrega>(
+            activeColor: Colors.green,
+            title: Text(
+              "Realiza a Entrega",
+              style: TextStyle(color: Colors.white),
+            ),
+            value: FazEntrega.entrega,
+            groupValue: fazEntrega,
+            onChanged: (FazEntrega? valor) {
+              setState(() {
+                fazEntrega = valor!;
+              });
+            },
+          ),
+          RadioListTile<FazEntrega>(
+            activeColor: Colors.green,
+            title: Text(
+              "Não Entrega",
+              style: TextStyle(color: Colors.white),
+            ),
+            value: FazEntrega.naoEntrega,
+            groupValue: fazEntrega,
+            onChanged: (FazEntrega? valor) {
+              setState(() {
+                fazEntrega = valor!;
+              });
+            },
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class TipoAnuncianteRadio extends StatefulWidget {
+  const TipoAnuncianteRadio({Key? key}) : super(key: key);
+
+  @override
+  State<TipoAnuncianteRadio> createState() => _TipoAnuncianteRadioState();
+}
+
+enum TipoAnunciante { producaoPropria, revendedor }
+
+class _TipoAnuncianteRadioState extends State<TipoAnuncianteRadio> {
+  TipoAnunciante tipoAnunciante = TipoAnunciante.producaoPropria;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(40),
+        border: Border.all(
+          color: Colors.white,
+          width: 4,
+        ),
+      ),
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(top: 10,),
+            child: Text("Proveniência:", style: TextStyle(color: Colors.white, fontSize: 20),),
+          ),
+          RadioListTile<TipoAnunciante>(
+            activeColor: Colors.green,
+            title: Text(
+              "Produção Própria",
+              style: TextStyle(color: Colors.white),
+            ),
+            value: TipoAnunciante.producaoPropria,
+            groupValue: tipoAnunciante,
+            onChanged: (TipoAnunciante? valor) {
+              setState(() {
+                tipoAnunciante = valor!;
+              });
+            },
+          ),
+          RadioListTile<TipoAnunciante>(
+            activeColor: Colors.green,
+            title: Text(
+              "Revendedor",
+              style: TextStyle(color: Colors.white),
+            ),
+            value: TipoAnunciante.revendedor,
+            groupValue: tipoAnunciante,
+            onChanged: (TipoAnunciante? valor) {
+              setState(() {
+                tipoAnunciante = valor!;
+              });
+            },
+          ),
+        ],
+      ),
+    );
   }
 }

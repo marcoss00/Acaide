@@ -1,5 +1,6 @@
 import 'package:acaide/models/media_preco.dart';
-import 'package:acaide/screens/sign_up_screen.dart';
+import 'package:acaide/screens/anuncio_form.dart';
+import 'package:acaide/screens/anuncios_list.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -14,7 +15,7 @@ class AcaideApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: SignUpScreen(),
+      home: AnunciosList(),
     );
   }
 }

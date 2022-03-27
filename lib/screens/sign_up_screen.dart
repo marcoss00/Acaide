@@ -3,9 +3,11 @@ import 'package:image_cropper/image_cropper.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
+import '../models/cidades.dart';
 
 File? _fotoPerfil;
 File? _fotoPerfilCortada;
+final Cidades _cidades = Cidades();
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({Key? key}) : super(key: key);
@@ -488,29 +490,7 @@ class _CidadeDropdownState extends State<CidadeDropdown> {
           valorSelecionado = novoValor!;
         });
       },
-      items: cidades,
+      items: _cidades.cidadesDropdown,
     );
-  }
-
-  List<DropdownMenuItem<String>> get cidades {
-    List<DropdownMenuItem<String>> cidadeItens = [
-      DropdownMenuItem(
-        child: Text("Belém"),
-        value: "Belém",
-      ),
-      DropdownMenuItem(
-        child: Text("Castanhal"),
-        value: "Castanhal",
-      ),
-      DropdownMenuItem(
-        child: Text("Abaetetuba"),
-        value: "Abaetetuba",
-      ),
-      DropdownMenuItem(
-        child: Text("Igarapé Miri"),
-        value: "Igarapé Miri",
-      ),
-    ];
-    return cidadeItens;
   }
 }
