@@ -1,10 +1,14 @@
+import 'package:acaide/models/anuncio.dart';
 import 'package:flutter/material.dart';
 
 class AnuncioItem extends StatelessWidget {
   final void Function()? onLongTap;
   final Widget? botoes;
+  final Anuncio anuncio;
 
-  const AnuncioItem({Key? key, this.onLongTap, this.botoes}) : super(key: key);
+  const AnuncioItem(
+      {Key? key, this.onLongTap, this.botoes, required this.anuncio})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -31,9 +35,9 @@ class AnuncioItem extends StatelessWidget {
           margin: EdgeInsets.all(16.0),
           child: Row(
             children: [
-              Image.asset(
-                "assets/images/teste.jpg",
-                fit: BoxFit.fitHeight,
+              Image.file(
+                anuncio.imagem,
+                fit: BoxFit.fill,
                 width: 100,
                 height: 100,
               ),
@@ -47,7 +51,7 @@ class AnuncioItem extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Morena Açaí',
+                        anuncio.titulo,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
@@ -55,12 +59,19 @@ class AnuncioItem extends StatelessWidget {
                           color: Colors.black54,
                         ),
                       ),
-                      Text(
-                        'Produção própria',
-                        style: TextStyle(
-                          color: Colors.black38,
-                        ),
-                      ),
+                      (anuncio.tipo_anunciante == true)
+                          ? Text(
+                              'Produção própria',
+                              style: TextStyle(
+                                color: Colors.black38,
+                              ),
+                            )
+                          : Text(
+                              'Revendedor',
+                              style: TextStyle(
+                                color: Colors.black38,
+                              ),
+                            ),
                       Row(
                         children: [
                           Padding(
@@ -72,16 +83,23 @@ class AnuncioItem extends StatelessWidget {
                               color: Colors.black38,
                             ),
                           ),
-                          Text(
-                            'Não entrega',
-                            style: TextStyle(
-                              color: Colors.black38,
-                            ),
-                          ),
+                          (anuncio.entrega == false)
+                              ? Text(
+                                  'Não entrega',
+                                  style: TextStyle(
+                                    color: Colors.black38,
+                                  ),
+                                )
+                              : Text(
+                                  'Entrega',
+                                  style: TextStyle(
+                                    color: Colors.black38,
+                                  ),
+                                ),
                         ],
                       ),
                       Text(
-                        'R\$ 110,00',
+                        "R\$ "+anuncio.preco.toString(),
                         style: TextStyle(
                           color: Colors.black,
                           fontFamily: 'RobotoSlab',

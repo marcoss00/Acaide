@@ -1,3 +1,4 @@
+import 'package:acaide/models/anuncio.dart';
 import 'package:acaide/models/cidade.dart';
 import 'package:acaide/models/cidades.dart';
 import 'package:flutter/material.dart';
@@ -6,7 +7,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:multi_select_flutter/multi_select_flutter.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-File? _fotoAnuncio;
+File? _fotoAnuncio = null;
 final Cidades _cidades = Cidades();
 
 class AnuncioForm extends StatefulWidget {
@@ -18,6 +19,14 @@ class AnuncioForm extends StatefulWidget {
 
 class _AnuncioFormState extends State<AnuncioForm> {
   Color top_color = Colors.purple[800]!;
+
+  final TextEditingController controladorCampoTitulo = TextEditingController();
+  final TextEditingController controladorCampoDescricao =
+      TextEditingController();
+  final TextEditingController controladorCampoQuantidadeSaca =
+      TextEditingController();
+  final TextEditingController controladorCampoPrecoSaca =
+      TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -60,6 +69,7 @@ class _AnuncioFormState extends State<AnuncioForm> {
                     Padding(
                       padding: const EdgeInsets.only(top: 20.0),
                       child: TextFormField(
+                        controller: controladorCampoTitulo,
                         keyboardType: TextInputType.text,
                         style: TextStyle(
                           color: Colors.white,
@@ -94,6 +104,7 @@ class _AnuncioFormState extends State<AnuncioForm> {
                     Padding(
                       padding: const EdgeInsets.only(top: 10.0),
                       child: TextFormField(
+                        controller: controladorCampoDescricao,
                         keyboardType: TextInputType.text,
                         style: TextStyle(
                           color: Colors.white,
@@ -137,6 +148,7 @@ class _AnuncioFormState extends State<AnuncioForm> {
                     Padding(
                       padding: const EdgeInsets.only(top: 20),
                       child: TextFormField(
+                        controller: controladorCampoQuantidadeSaca,
                         keyboardType: TextInputType.number,
                         style: TextStyle(
                           color: Colors.white,
@@ -169,6 +181,7 @@ class _AnuncioFormState extends State<AnuncioForm> {
                     Padding(
                       padding: const EdgeInsets.only(top: 20),
                       child: TextFormField(
+                        controller: controladorCampoPrecoSaca,
                         keyboardType: TextInputType.number,
                         style: TextStyle(
                           color: Colors.white,
@@ -219,7 +232,7 @@ class _AnuncioFormState extends State<AnuncioForm> {
               Container(
                 width: 500,
                 child: ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () => _criaAnuncio(context),
                   child: Text(
                     "Enviar Anúncio",
                     style: TextStyle(
@@ -240,6 +253,29 @@ class _AnuncioFormState extends State<AnuncioForm> {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  void _criaAnuncio(BuildContext context) {
+    final int? quantSaca = int.tryParse(controladorCampoQuantidadeSaca.text);
+    final double? preco = double.tryParse(controladorCampoPrecoSaca.text);
+
+    final Anuncio anuncioCriado = Anuncio(
+      controladorCampoTitulo.text,
+      tipoAnunciante == TipoAnunciante.producaoPropria,
+      fazEntrega == FazEntrega.entrega,
+      preco,
+      _cidadesSelecionadas,
+      _fotoAnuncio!,
+      quantSaca,
+      controladorCampoDescricao.text,
+    );
+
+    Navigator.pop(context, anuncioCriado);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text("Anúncio Criado"),
       ),
     );
   }
@@ -387,8 +423,9 @@ class CidadeDropdown extends StatefulWidget {
   State<CidadeDropdown> createState() => _CidadeDropdownState();
 }
 
+List<Object?> _cidadesSelecionadas = [];
+
 class _CidadeDropdownState extends State<CidadeDropdown> {
-  List<Object?> _cidadesSelecionadas = [];
   final _itens = _cidades.cidadesList
       .map((cidade) => MultiSelectItem<Cidade>(cidade, cidade.name!))
       .toList();
@@ -443,9 +480,9 @@ class EntregaRadio extends StatefulWidget {
 
 enum FazEntrega { entrega, naoEntrega }
 
-class _EntregaRadioState extends State<EntregaRadio> {
-  FazEntrega fazEntrega = FazEntrega.naoEntrega;
+FazEntrega fazEntrega = FazEntrega.naoEntrega;
 
+class _EntregaRadioState extends State<EntregaRadio> {
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -460,7 +497,10 @@ class _EntregaRadioState extends State<EntregaRadio> {
         children: [
           Padding(
             padding: const EdgeInsets.only(top: 10),
-            child: Text("Entrega:", style: TextStyle(color: Colors.white, fontSize: 20),),
+            child: Text(
+              "Entrega:",
+              style: TextStyle(color: Colors.white, fontSize: 20),
+            ),
           ),
           RadioListTile<FazEntrega>(
             activeColor: Colors.green,
@@ -505,9 +545,9 @@ class TipoAnuncianteRadio extends StatefulWidget {
 
 enum TipoAnunciante { producaoPropria, revendedor }
 
-class _TipoAnuncianteRadioState extends State<TipoAnuncianteRadio> {
-  TipoAnunciante tipoAnunciante = TipoAnunciante.producaoPropria;
+TipoAnunciante tipoAnunciante = TipoAnunciante.producaoPropria;
 
+class _TipoAnuncianteRadioState extends State<TipoAnuncianteRadio> {
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -521,8 +561,13 @@ class _TipoAnuncianteRadioState extends State<TipoAnuncianteRadio> {
       child: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.only(top: 10,),
-            child: Text("Proveniência:", style: TextStyle(color: Colors.white, fontSize: 20),),
+            padding: const EdgeInsets.only(
+              top: 10,
+            ),
+            child: Text(
+              "Proveniência:",
+              style: TextStyle(color: Colors.white, fontSize: 20),
+            ),
           ),
           RadioListTile<TipoAnunciante>(
             activeColor: Colors.green,

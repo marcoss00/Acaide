@@ -1,11 +1,12 @@
 import 'package:acaide/models/media_preco.dart';
-import 'package:acaide/screens/anuncio_form.dart';
 import 'package:acaide/screens/anuncios_list.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 void main() => runApp(ChangeNotifierProvider(
-      create: (context) => MediaPreco(100.0),
+      create: (context) {
+        return MediaPreco(0);
+      },
       child: AcaideApp(),
     ));
 

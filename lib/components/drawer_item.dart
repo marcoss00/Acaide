@@ -1,3 +1,7 @@
+import 'package:acaide/screens/anuncio_form.dart';
+import 'package:acaide/screens/anuncios_list.dart';
+import 'package:acaide/screens/meu_perfil_screen.dart';
+import 'package:acaide/screens/meus_anuncios_list.dart';
 import 'package:flutter/material.dart';
 
 class DrawerItem extends StatefulWidget {
@@ -67,104 +71,173 @@ class _DrawerItemState extends State<DrawerItem> {
                   ),
                 ),
               ),
-        ListTile(
-          contentPadding: EdgeInsets.only(left: 5),
-          leading: Image.asset(
-            "assets/images/logo-marca.png",
-            width: 40,
-            height: 40,
-          ),
-          title: Padding(
-            padding: const EdgeInsets.only(left: 10),
-            child: Text(
-              "Anúncios",
-              style: TextStyle(fontSize: 18),
+        Material(
+          child: InkWell(
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => AnunciosList(),
+                ),
+              );
+            },
+            child: ListTile(
+              contentPadding: EdgeInsets.only(left: 5),
+              leading: Image.asset(
+                "assets/images/logo-marca.png",
+                width: 40,
+                height: 40,
+              ),
+              title: Padding(
+                padding: const EdgeInsets.only(left: 10),
+                child: Text(
+                  "Anúncios",
+                  style: TextStyle(fontSize: 18),
+                ),
+              ),
             ),
           ),
         ),
-        ListTile(
-          leading: Icon(
-            Icons.create,
-            color: Colors.purple[800],
-          ),
-          title: Text(
-            "Inserir Anúncio",
-            style: TextStyle(fontSize: 18),
-          ),
-        ),
-        ListTile(
-          leading: Icon(
-            Icons.description,
-            color: Colors.purple[800],
-          ),
-          title: Text(
-            "Meus Anúncios",
-            style: TextStyle(fontSize: 18),
-          ),
-        ),
-        ListTile(
-          leading: Icon(
-            Icons.stacked_bar_chart,
-            color: Colors.purple[800],
-          ),
-          title: Text(
-            "Preço Médio",
-            style: TextStyle(fontSize: 18),
+        Material(
+          child: InkWell(
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => AnuncioForm(),
+                ),
+              );
+            },
+            child: ListTile(
+              leading: Icon(
+                Icons.create,
+                color: Colors.purple[800],
+              ),
+              title: Text(
+                "Inserir Anúncio",
+                style: TextStyle(fontSize: 18),
+              ),
+            ),
           ),
         ),
-        ListTile(
-          leading: Icon(
-            Icons.person,
-            color: Colors.purple[800],
+        Material(
+          child: InkWell(
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => MeusAnunciosList(),
+                ),
+              );
+            },
+            child: ListTile(
+              leading: Icon(
+                Icons.description,
+                color: Colors.purple[800],
+              ),
+              title: Text(
+                "Meus Anúncios",
+                style: TextStyle(fontSize: 18),
+              ),
+            ),
           ),
-          title: Text(
-            "Meu Perfil",
-            style: TextStyle(fontSize: 18),
+        ),
+        Material(
+          child: InkWell(
+            onTap: () {},
+            child: ListTile(
+              leading: Icon(
+                Icons.stacked_bar_chart,
+                color: Colors.purple[800],
+              ),
+              title: Text(
+                "Preço Médio",
+                style: TextStyle(fontSize: 18),
+              ),
+            ),
+          ),
+        ),
+        Material(
+          child: InkWell(
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => MeuPerfilScreen(),
+                ),
+              );
+            },
+            child: ListTile(
+              leading: Icon(
+                Icons.person,
+                color: Colors.purple[800],
+              ),
+              title: Text(
+                "Meu Perfil",
+                style: TextStyle(fontSize: 18),
+              ),
+            ),
           ),
         ),
         (this.logado == true)
-            ? ListTile(
-                leading: Icon(
-                  Icons.arrow_back,
-                  color: Colors.purple[800],
-                ),
-                title: Text(
-                  "Sair",
-                  style: TextStyle(fontSize: 18),
+            ? Material(
+                child: InkWell(
+                  onTap: () {},
+                  child: ListTile(
+                    leading: Icon(
+                      Icons.arrow_back,
+                      color: Colors.purple[800],
+                    ),
+                    title: Text(
+                      "Sair",
+                      style: TextStyle(fontSize: 18),
+                    ),
+                  ),
                 ),
               )
             : Container(),
         Divider(
           color: (this.logado == true) ? Colors.black : null,
         ),
-        ListTile(
-          leading: Icon(
-            Icons.help,
-            color: Colors.purple[800],
-          ),
-          title: Text(
-            "Ajuda",
-            style: TextStyle(fontSize: 18),
-          ),
-        ),
-        ListTile(
-          leading: Icon(
-            Icons.bug_report,
-            color: Colors.purple[800],
-          ),
-          title: Text(
-            "Reportar Erro",
-            style: TextStyle(fontSize: 18),
+        Material(
+          child: InkWell(
+            onTap: (){},
+            child: ListTile(
+              leading: Icon(
+                Icons.help,
+                color: Colors.purple[800],
+              ),
+              title: Text(
+                "Ajuda",
+                style: TextStyle(fontSize: 18),
+              ),
+            ),
           ),
         ),
-        ListTile(
-          leading: Icon(
-            Icons.announcement,
-            color: Colors.purple[800],
+        Material(
+          child: InkWell(
+            onTap: (){},
+            child: ListTile(
+              leading: Icon(
+                Icons.bug_report,
+                color: Colors.purple[800],
+              ),
+              title: Text(
+                "Reportar Erro",
+                style: TextStyle(fontSize: 18),
+              ),
+            ),
           ),
-          title: Text(
-            "Sobre",
-            style: TextStyle(fontSize: 18),
+        ),
+        Material(
+          child: InkWell(
+            onTap: (){},
+            child: ListTile(
+              leading: Icon(
+                Icons.announcement,
+                color: Colors.purple[800],
+              ),
+              title: Text(
+                "Sobre",
+                style: TextStyle(fontSize: 18),
+              ),
+            ),
           ),
         ),
       ],

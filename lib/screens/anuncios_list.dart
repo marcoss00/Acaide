@@ -1,5 +1,6 @@
 import 'package:acaide/components/anuncio_item.dart';
 import 'package:acaide/components/drawer_item.dart';
+import 'package:acaide/models/anuncio.dart';
 import 'package:flutter/material.dart';
 import 'package:multi_select_flutter/chip_display/multi_select_chip_display.dart';
 import 'package:multi_select_flutter/dialog/multi_select_dialog_field.dart';
@@ -13,9 +14,16 @@ final _itens = _cidades.cidadesList
     .map((cidade) => MultiSelectItem<Cidade>(cidade, cidade.name!))
     .toList();
 
-class AnunciosList extends StatelessWidget {
-  const AnunciosList({Key? key}) : super(key: key);
+class AnunciosList extends StatefulWidget {
+  final List<Anuncio> _anuncios = [];
 
+  AnunciosList({Key? key}) : super(key: key);
+
+  @override
+  State<AnunciosList> createState() => _AnunciosListState();
+}
+
+class _AnunciosListState extends State<AnunciosList> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -43,19 +51,18 @@ class AnunciosList extends StatelessWidget {
           ),
         ],
       ),
-      body: ListView(
+      body: ListView.builder(
         scrollDirection: Axis.vertical,
-        children: [
-          Column(
+        itemCount: widget._anuncios.length,
+        itemBuilder: (context, indice) {
+          final anuncio = widget._anuncios[indice];
+          return Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              AnuncioItem(
-                botoes: Container(),
-              ),
+              AnuncioItem(anuncio: anuncio),
             ],
-          ),
-        ],
-      ),
+          );
+        },),
     );
   }
 

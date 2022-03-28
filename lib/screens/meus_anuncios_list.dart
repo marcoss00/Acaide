@@ -1,9 +1,13 @@
 import 'package:acaide/components/anuncio_item.dart';
 import 'package:acaide/components/drawer_item.dart';
+import 'package:acaide/models/anuncio.dart';
+import 'package:acaide/screens/anuncio_form.dart';
 import 'package:flutter/material.dart';
 
 class MeusAnunciosList extends StatefulWidget {
-  const MeusAnunciosList({Key? key}) : super(key: key);
+  final List<Anuncio> _anuncios = [];
+
+  MeusAnunciosList({Key? key}) : super(key: key);
 
   @override
   State<MeusAnunciosList> createState() => _MeusAnunciosListState();
@@ -29,8 +33,8 @@ class _MeusAnunciosListState extends State<MeusAnunciosList> {
         backgroundColor: Colors.purple[800],
         actions: [
           //IconButton(
-            //onPressed: () {},
-            //icon: Icon(Icons.more_vert_rounded),
+          //onPressed: () {},
+          //icon: Icon(Icons.more_vert_rounded),
           //),
         ],
       ),
@@ -40,15 +44,28 @@ class _MeusAnunciosListState extends State<MeusAnunciosList> {
           "+",
           style: TextStyle(fontSize: 28, color: Colors.purple[800]),
         ),
-        onPressed: () {},
+        onPressed: () {
+          final Future<Anuncio?> future = Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) {
+              return AnuncioForm();
+            }),
+          );
+          future.then(
+                (anuncioRecebido) => _atualiza(anuncioRecebido),
+          );
+        },
       ),
-      body: ListView(
+      body: ListView.builder(
         scrollDirection: Axis.vertical,
-        children: [
-          Column(
+        itemCount:widget._anuncios.length,
+        itemBuilder: (context, indice) {
+          final anuncio = widget._anuncios[indice];
+          return Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               AnuncioItem(
+                anuncio: anuncio,
                 onLongTap: () {
                   _showDialog();
                 },
@@ -68,10 +85,16 @@ class _MeusAnunciosListState extends State<MeusAnunciosList> {
                 ),
               ),
             ],
-          ),
-        ],
+          );
+        },
       ),
     );
+  }
+
+  void _atualiza(Anuncio? anuncioRecebido) {
+    setState(() {
+      widget._anuncios.add(anuncioRecebido!);
+    });
   }
 
   Future<void> _showDialog() async {
@@ -82,15 +105,15 @@ class _MeusAnunciosListState extends State<MeusAnunciosList> {
         return SimpleDialog(
           children: [
             SimpleDialogOption(
-              onPressed: (){},
+              onPressed: () {},
               child: Text("Visualizar"),
             ),
             SimpleDialogOption(
-              onPressed: (){},
+              onPressed: () {},
               child: Text("Editar"),
             ),
             SimpleDialogOption(
-              onPressed: ()=> _deleteDialog(),
+              onPressed: () => _deleteDialog(),
               child: Text("Excluir"),
             ),
           ],
@@ -98,7 +121,8 @@ class _MeusAnunciosListState extends State<MeusAnunciosList> {
       },
     );
   }
-  Future<void> _deleteDialog() async{
+
+  Future<void> _deleteDialog() async {
     return showDialog<void>(
       context: context,
       builder: (BuildContext context) => AlertDialog(
