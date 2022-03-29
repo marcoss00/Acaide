@@ -265,10 +265,10 @@ class _AnuncioFormState extends State<AnuncioForm> {
       controladorCampoTitulo.text,
       tipoAnunciante == TipoAnunciante.producaoPropria,
       fazEntrega == FazEntrega.entrega,
-      preco,
+      preco!,
       _cidadesSelecionadas,
       _fotoAnuncio!,
-      quantSaca,
+      quantSaca!,
       controladorCampoDescricao.text,
     );
 

@@ -1,3 +1,4 @@
+import 'package:acaide/components/drawer_item.dart';
 import 'package:acaide/models/media_preco.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -10,7 +11,6 @@ class MediaPrecoScreen extends StatefulWidget {
 }
 
 class _MediaPrecoScreenState extends State<MediaPrecoScreen> {
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -24,6 +24,9 @@ class _MediaPrecoScreenState extends State<MediaPrecoScreen> {
           ),
         ),
         centerTitle: true,
+      ),
+      drawer: Drawer(
+        child: DrawerItem(),
       ),
       body: Align(
         alignment: Alignment.topCenter,
