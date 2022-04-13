@@ -1,15 +1,19 @@
 import 'package:acaide/models/anuncio.dart';
 import 'package:flutter/material.dart';
 
-class AnuncioItem extends StatelessWidget {
+class AnuncioItem extends StatefulWidget {
   final void Function()? onLongTap;
   final Widget? botoes;
   final Anuncio anuncio;
 
-  const AnuncioItem(
-      {Key? key, this.onLongTap, this.botoes, required this.anuncio})
+  AnuncioItem({Key? key, this.onLongTap, this.botoes, required this.anuncio})
       : super(key: key);
 
+  @override
+  State<AnuncioItem> createState() => _AnuncioItemState();
+}
+
+class _AnuncioItemState extends State<AnuncioItem> {
   @override
   Widget build(BuildContext context) {
     return Material(
@@ -23,7 +27,7 @@ class AnuncioItem extends StatelessWidget {
           Radius.circular(20.0),
         ),
         onTap: () {},
-        onLongPress: onLongTap,
+        onLongPress: widget.onLongTap,
         child: Container(
           decoration: BoxDecoration(
             color: Colors.white,
@@ -35,11 +39,35 @@ class AnuncioItem extends StatelessWidget {
           margin: EdgeInsets.all(16.0),
           child: Row(
             children: [
-              Image.file(
-                anuncio.imagem,
+              Image.network(
+                widget.anuncio.imagem,
                 fit: BoxFit.fill,
                 width: 100,
                 height: 100,
+                errorBuilder: (BuildContext context, Object exception,
+                    StackTrace? stackTrace) {
+                  return Row(
+                    children: [
+                      Icon(Icons.error),
+                      Text("Erro!\nRecarregue\na pagina"),
+                    ],
+                  );
+                },
+                loadingBuilder: (BuildContext context, Widget child,
+                    ImageChunkEvent? loadingProgress) {
+                  if (loadingProgress == null) {
+                    return child;
+                  }
+                  return Center(
+                    child: CircularProgressIndicator(
+                      color: Colors.purple[800],
+                      value: loadingProgress.expectedTotalBytes != null
+                          ? loadingProgress.cumulativeBytesLoaded /
+                              loadingProgress.expectedTotalBytes!
+                          : null,
+                    ),
+                  );
+                },
               ),
               Expanded(
                 child: Padding(
@@ -51,7 +79,7 @@ class AnuncioItem extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        anuncio.titulo,
+                        widget.anuncio.titulo,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
@@ -59,7 +87,7 @@ class AnuncioItem extends StatelessWidget {
                           color: Colors.black54,
                         ),
                       ),
-                      (anuncio.tipo_anunciante == true)
+                      (widget.anuncio.tipo_anunciante == true)
                           ? Text(
                               'Produção própria',
                               style: TextStyle(
@@ -83,7 +111,7 @@ class AnuncioItem extends StatelessWidget {
                               color: Colors.black38,
                             ),
                           ),
-                          (anuncio.entrega == false)
+                          (widget.anuncio.entrega == false)
                               ? Text(
                                   'Não entrega',
                                   style: TextStyle(
@@ -99,7 +127,7 @@ class AnuncioItem extends StatelessWidget {
                         ],
                       ),
                       Text(
-                        "R\$ "+anuncio.preco.toString(),
+                        "R\$ " + widget.anuncio.preco.toString(),
                         style: TextStyle(
                           color: Colors.black,
                           fontFamily: 'RobotoSlab',
@@ -111,7 +139,7 @@ class AnuncioItem extends StatelessWidget {
                   ),
                 ),
               ),
-              botoes!,
+              widget.botoes!,
             ],
           ),
         ),

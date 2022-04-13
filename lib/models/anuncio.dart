@@ -1,15 +1,22 @@
-import 'dart:io';
-
 class Anuncio {
+  final String id;
   final String titulo;
   final bool tipo_anunciante;
-  final int quant_telas;
+  final int quant_rasas;
   final bool entrega;
   final double preco;
-  final List<Object?> cidades;
-  final File imagem;
+  final Map<String, int> cidades;
+  final String imagem;
   final String descricao;
 
-  Anuncio(this.titulo, this.tipo_anunciante, this.entrega, this.preco,
-      this.cidades, this.imagem, this.quant_telas, this.descricao);
+  Anuncio(
+      {required this.id,
+      required this.titulo,
+      required this.tipo_anunciante,
+      required this.entrega,
+      required this.preco,
+      required this.cidades,
+      required this.imagem,
+      required this.quant_rasas,
+      required this.descricao});
 }

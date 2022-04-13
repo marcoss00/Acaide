@@ -1,22 +1,20 @@
 import 'package:acaide/components/anuncio_item.dart';
 import 'package:acaide/components/drawer_item.dart';
+import 'package:acaide/database/anuncio_database.dart';
 import 'package:acaide/models/anuncio.dart';
 import 'package:flutter/material.dart';
 import 'package:multi_select_flutter/chip_display/multi_select_chip_display.dart';
 import 'package:multi_select_flutter/dialog/multi_select_dialog_field.dart';
 import 'package:multi_select_flutter/util/multi_select_item.dart';
 import '../models/cidade.dart';
-import '../models/cidades.dart';
+import '../models/cidades_repository.dart';
 
-final Cidades _cidades = Cidades();
-List<Object?> _cidadesSelecionadas = [_cidades.cidadesList[0]];
-final _itens = _cidades.cidadesList
-    .map((cidade) => MultiSelectItem<Cidade>(cidade, cidade.name!))
-    .toList();
+List<Anuncio>? anuncios = [];
+final CidadesRepository _cidades = CidadesRepository();
+List<Object?> _cidadesSelecionadas = [_cidades.cidadesList[18]];
+bool delayInicio = true;
 
 class AnunciosList extends StatefulWidget {
-  final List<Anuncio> _anuncios = [];
-
   AnunciosList({Key? key}) : super(key: key);
 
   @override
@@ -24,6 +22,24 @@ class AnunciosList extends StatefulWidget {
 }
 
 class _AnunciosListState extends State<AnunciosList> {
+  final AnuncioDatabase _dao = AnuncioDatabase();
+
+  carregarApi() async {
+    var cidadesList = await _cidades.getCidadesFromAPI();
+    return cidadesList;
+    //função feita apenas pra carregar api das cidades junto com a screen.
+    //Não precisa retornar "cidadesList", mas coloquei pra retornar só pra não ficar o aviso que a variavel n ta sendo usada.
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    carregarApi();
+    delayInicio = true;
+    Future.delayed (
+        Duration(seconds: 2), () => setState(() => delayInicio = false));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -51,22 +67,69 @@ class _AnunciosListState extends State<AnunciosList> {
           ),
         ],
       ),
-      body: ListView.builder(
-        scrollDirection: Axis.vertical,
-        itemCount: widget._anuncios.length,
-        itemBuilder: (context, indice) {
-          final anuncio = widget._anuncios[indice];
-          return Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              AnuncioItem(anuncio: anuncio),
-            ],
-          );
-        },),
+      body: (delayInicio)
+          ? Center(
+              child: CircularProgressIndicator(
+                color: Colors.white,
+              ),
+            )
+          : FutureBuilder<List<Anuncio>>(
+              initialData: [],
+              future: _dao.findAllAnuncio(),
+              builder: (context, snapshot) {
+                switch (snapshot.connectionState) {
+                  case ConnectionState.none:
+                    break;
+                  case ConnectionState.waiting:
+                    return Center(
+                      child: CircularProgressIndicator(
+                        color: Colors.white,
+                      ),
+                    );
+                  case ConnectionState.active:
+                    break;
+                  case ConnectionState.done:
+                    anuncios = snapshot.data;
+                    return RefreshIndicator(
+                      onRefresh: () => _reloadList(snapshot),
+                      child: ListView.builder(
+                        scrollDirection: Axis.vertical,
+                        itemCount: anuncios?.length,
+                        itemBuilder: (context, indice) {
+                          final anuncio = anuncios![indice];
+                          return Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              AnuncioItem(
+                                anuncio: anuncio,
+                                onLongTap: () {},
+                                botoes: Container(),
+                              ),
+                            ],
+                          );
+                        },
+                      ),
+                    );
+                }
+                return Text("Erro desconhecido!");
+              },
+            ),
     );
   }
 
+  Future<void> _reloadList(AsyncSnapshot snapshot) async {
+    var newList =
+        await Future.delayed(Duration(seconds: 2), () => snapshot.data);
+    setState(() {
+      anuncios = newList;
+    });
+  }
+
   Future<void> _showMultiSelect(BuildContext context) async {
+    var cidadesList = await _cidades.getCidadesFromAPI();
+    final _itens = cidadesList
+        .map((cidade) => MultiSelectItem<Cidade>(cidade, cidade.nome!))
+        .toList();
     return showDialog<void>(
       barrierDismissible: true,
       context: context,
@@ -94,6 +157,11 @@ class _AnunciosListState extends State<AnunciosList> {
               selectedColor: Colors.purple,
               onConfirm: (resultado) {
                 _cidadesSelecionadas = resultado;
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => AnunciosList(),
+                  ),
+                );
               },
               searchIcon: Icon(Icons.search),
               selectedItemsTextStyle: TextStyle(color: Colors.green),

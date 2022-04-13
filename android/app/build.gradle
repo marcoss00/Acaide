@@ -39,6 +39,7 @@ android {
         applicationId "com.example.acaide"
         minSdkVersion 19//flutter.minSdkVersion
         targetSdkVersion flutter.targetSdkVersion
+        multiDexEnabled true
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
     }

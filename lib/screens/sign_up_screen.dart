@@ -3,11 +3,12 @@ import 'package:image_cropper/image_cropper.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
-import '../models/cidades.dart';
+import '../models/cidades_repository.dart';
 
 File? _fotoPerfil;
 File? _fotoPerfilCortada;
-final Cidades _cidades = Cidades();
+final CidadesRepository _cidades = CidadesRepository();
+List<DropdownMenuItem<String>> listCidades = [];
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({Key? key}) : super(key: key);
@@ -68,7 +69,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         style: TextStyle(
                           color: Colors.white,
                         ),
-                        autofocus: true,
                         decoration: InputDecoration(
                           labelText: "Nome Completo",
                           labelStyle: TextStyle(
@@ -97,7 +97,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         style: TextStyle(
                           color: Colors.white,
                         ),
-                        autofocus: true,
                         decoration: InputDecoration(
                           labelText: "E-mail",
                           labelStyle: TextStyle(
@@ -126,7 +125,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         style: TextStyle(
                           color: Colors.white,
                         ),
-                        autofocus: true,
                         decoration: InputDecoration(
                           labelText: "CPF",
                           labelStyle: TextStyle(
@@ -156,7 +154,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         style: TextStyle(
                           color: Colors.white,
                         ),
-                        autofocus: true,
                         decoration: InputDecoration(
                           labelText: "Número de Telefone",
                           labelStyle: TextStyle(
@@ -458,6 +455,16 @@ class CidadeDropdown extends StatefulWidget {
 class _CidadeDropdownState extends State<CidadeDropdown> {
   String? valorSelecionado = null;
 
+  cidadeList() async{
+    listCidades = await _cidades.cidadesDropdown;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    cidadeList();
+  }
+
   @override
   Widget build(BuildContext context) {
     return DropdownButtonFormField(
@@ -490,7 +497,7 @@ class _CidadeDropdownState extends State<CidadeDropdown> {
           valorSelecionado = novoValor!;
         });
       },
-      items: _cidades.cidadesDropdown,
+      items: listCidades,
     );
   }
 }

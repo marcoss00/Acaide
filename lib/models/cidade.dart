@@ -1,9 +1,9 @@
 class Cidade {
+  final String? nome;
   final int? id;
-  final String? name;
 
   Cidade({
+    this.nome,
     this.id,
-    this.name,
   });
 }

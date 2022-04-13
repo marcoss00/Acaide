@@ -24,8 +24,16 @@ class _DrawerItemState extends State<DrawerItem> {
         (this.logado == true)
             ? UserAccountsDrawerHeader(
                 decoration: BoxDecoration(color: Colors.purple[800]),
-                accountEmail: Text("marcos18300024@aluno.cesupa.br"),
-                accountName: Text("Marcos Vinicius"),
+                accountEmail: Text(
+                  "marcos18300024@aluno.cesupa.br",
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                accountName: Text(
+                  "Marcos Vinicius",
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
                 currentAccountPicture: (this.foto_perfil == true)
                     ? CircleAvatar(
                         backgroundImage: AssetImage("assets/images/perfil.png"),
@@ -204,7 +212,7 @@ class _DrawerItemState extends State<DrawerItem> {
         ),
         Material(
           child: InkWell(
-            onTap: (){},
+            onTap: () {},
             child: ListTile(
               leading: Icon(
                 Icons.help,
@@ -219,7 +227,7 @@ class _DrawerItemState extends State<DrawerItem> {
         ),
         Material(
           child: InkWell(
-            onTap: (){},
+            onTap: () {},
             child: ListTile(
               leading: Icon(
                 Icons.bug_report,
@@ -234,7 +242,7 @@ class _DrawerItemState extends State<DrawerItem> {
         ),
         Material(
           child: InkWell(
-            onTap: (){},
+            onTap: () {},
             child: ListTile(
               leading: Icon(
                 Icons.announcement,
