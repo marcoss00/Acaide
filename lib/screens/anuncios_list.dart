@@ -9,7 +9,7 @@ import 'package:multi_select_flutter/util/multi_select_item.dart';
 import '../models/cidade.dart';
 import '../models/cidades_repository.dart';
 
-List<Anuncio>? anuncios = [];
+List<Anuncio>? anunciosFiltrados = [];
 final CidadesRepository _cidades = CidadesRepository();
 List<Object?> _cidadesSelecionadas = [_cidades.cidadesList[18]];
 bool delayInicio = true;
@@ -36,7 +36,7 @@ class _AnunciosListState extends State<AnunciosList> {
     super.initState();
     carregarApi();
     delayInicio = true;
-    Future.delayed (
+    Future.delayed(
         Duration(seconds: 2), () => setState(() => delayInicio = false));
   }
 
@@ -89,14 +89,14 @@ class _AnunciosListState extends State<AnunciosList> {
                   case ConnectionState.active:
                     break;
                   case ConnectionState.done:
-                    anuncios = snapshot.data;
+                    anunciosFiltrados = filtroCidades(snapshot);
                     return RefreshIndicator(
                       onRefresh: () => _reloadList(snapshot),
                       child: ListView.builder(
                         scrollDirection: Axis.vertical,
-                        itemCount: anuncios?.length,
+                        itemCount: anunciosFiltrados?.length,
                         itemBuilder: (context, indice) {
-                          final anuncio = anuncios![indice];
+                          final anuncio = anunciosFiltrados![indice];
                           return Column(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
@@ -117,11 +117,43 @@ class _AnunciosListState extends State<AnunciosList> {
     );
   }
 
+  filtroCidades(AsyncSnapshot<List<Anuncio>> snapshot) {
+    List<Anuncio>? anuncios = snapshot.data;
+    List<int> cidadesSelecionadasId = [];
+    final Map<String, int> cidadesSelecionadasMap = Map.fromIterable(
+        _cidadesSelecionadas,
+        key: (cidade) => cidade.nome,
+        value: (cidade) => cidade.id);
+    cidadesSelecionadasMap.forEach((key, value) {
+      cidadesSelecionadasId.add(value);
+    });
+    for (int i = 0; i < anuncios!.length; i++) {
+      bool temCidade = false;
+      List<int> cidadesAnuncioId = [];
+      final Map<String, int> cidadesAnuncioMap = anuncios[i].cidades;
+      cidadesAnuncioMap.forEach((key, value) {
+        cidadesAnuncioId.add(value);
+      });
+      for (int j = 0; j < cidadesSelecionadasId.length; j++) {
+        for (int k = 0; k < cidadesAnuncioId.length; k++) {
+          if (cidadesSelecionadasId[j] == cidadesAnuncioId[k]) {
+            temCidade = true;
+          }
+        }
+      }
+      if (temCidade == false) {
+        anuncios.remove(anuncios[i]);
+        i = i - 1;
+      }
+    }
+    return anuncios;
+  }
+
   Future<void> _reloadList(AsyncSnapshot snapshot) async {
     var newList =
         await Future.delayed(Duration(seconds: 2), () => snapshot.data);
     setState(() {
-      anuncios = newList;
+      anunciosFiltrados = filtroCidades(newList);
     });
   }
 

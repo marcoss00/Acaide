@@ -14,12 +14,12 @@ class CidadesRepository {
   Future<List<DropdownMenuItem<String>>> get cidadesDropdown async {
     List<DropdownMenuItem<String>> cidadeItens = [];
     cidadesList = await getCidadesFromAPI();
-    for (int j = 0; j < quantidadeCidadesPara; j++) {
+    cidadesList.forEach((cidade) {
       cidadeItens.add(DropdownMenuItem(
-        child: Text(cidadesList[j].nome.toString()),
-        value: cidadesList[j].id.toString(),
+        child: Text(cidade.nome.toString()),
+        value: cidade.id.toString(),
       ));
-    }
+    });
     return cidadeItens;
   }
 

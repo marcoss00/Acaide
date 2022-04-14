@@ -1,4 +1,5 @@
 import 'package:acaide/models/anuncio.dart';
+import 'package:acaide/screens/anuncio_detalhes_screen.dart';
 import 'package:flutter/material.dart';
 
 class AnuncioItem extends StatefulWidget {
@@ -26,7 +27,13 @@ class _AnuncioItemState extends State<AnuncioItem> {
         borderRadius: BorderRadius.all(
           Radius.circular(20.0),
         ),
-        onTap: () {},
+        onTap: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => AnuncioDetalhesScreen(),
+            ),
+          );
+        },
         onLongPress: widget.onLongTap,
         child: Container(
           decoration: BoxDecoration(
