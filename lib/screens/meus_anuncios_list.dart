@@ -2,6 +2,7 @@ import 'package:acaide/components/anuncio_item.dart';
 import 'package:acaide/components/drawer_item.dart';
 import 'package:acaide/database/anuncio_database.dart';
 import 'package:acaide/models/anuncio.dart';
+import 'package:acaide/screens/anuncio_detalhes_screen.dart';
 import 'package:acaide/screens/anuncio_form.dart';
 import 'package:flutter/material.dart';
 
@@ -148,7 +149,13 @@ class _MeusAnunciosListState extends State<MeusAnunciosList> {
         return SimpleDialog(
           children: [
             SimpleDialogOption(
-              onPressed: () {},
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => AnuncioDetalhesScreen(anuncio: anuncio),
+                  ),
+                );
+              },
               child: Text("Visualizar"),
             ),
             SimpleDialogOption(

@@ -133,7 +133,7 @@ class _AnuncioFormState extends State<AnuncioForm> {
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return "É obrigatório uma descrição para o\nanúncio";
-                          } else if (value.length > 100) {
+                          } else if (value.length > 300) {
                             return "Numéro máximo de caracteres\nexcedido";
                           }
                           return null;
@@ -146,7 +146,7 @@ class _AnuncioFormState extends State<AnuncioForm> {
                         decoration: InputDecoration(
                           hintMaxLines: 4,
                           counterText:
-                              "${controladorCampoDescricao.text.length}/100",
+                              "${controladorCampoDescricao.text.length}/300",
                           counterStyle: TextStyle(color: Colors.white),
                           hintText:
                               "Ex: Açaí de excelente qualidade, produzido na região... Entre em contato para mais informações",

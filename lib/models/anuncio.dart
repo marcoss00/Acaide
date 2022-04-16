@@ -1,5 +1,6 @@
 class Anuncio {
   final String id;
+  //final String idUsuario;
   final String titulo;
   final bool tipo_anunciante;
   final int quant_rasas;
@@ -8,6 +9,7 @@ class Anuncio {
   final Map<String, int> cidades;
   final String imagem;
   final String descricao;
+  //final Time dataPostagem;
 
   Anuncio(
       {required this.id,

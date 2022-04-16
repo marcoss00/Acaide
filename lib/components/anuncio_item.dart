@@ -1,6 +1,9 @@
 import 'package:acaide/models/anuncio.dart';
 import 'package:acaide/screens/anuncio_detalhes_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+
+NumberFormat formatter = NumberFormat.simpleCurrency(locale: 'pt_BR');
 
 class AnuncioItem extends StatefulWidget {
   final void Function()? onLongTap;
@@ -30,7 +33,8 @@ class _AnuncioItemState extends State<AnuncioItem> {
         onTap: () {
           Navigator.of(context).push(
             MaterialPageRoute(
-              builder: (context) => AnuncioDetalhesScreen(),
+              builder: (context) =>
+                  AnuncioDetalhesScreen(anuncio: widget.anuncio),
             ),
           );
         },
@@ -46,35 +50,38 @@ class _AnuncioItemState extends State<AnuncioItem> {
           margin: EdgeInsets.all(16.0),
           child: Row(
             children: [
-              Image.network(
-                widget.anuncio.imagem,
-                fit: BoxFit.fill,
-                width: 100,
-                height: 100,
-                errorBuilder: (BuildContext context, Object exception,
-                    StackTrace? stackTrace) {
-                  return Row(
-                    children: [
-                      Icon(Icons.error),
-                      Text("Erro!\nRecarregue\na pagina"),
-                    ],
-                  );
-                },
-                loadingBuilder: (BuildContext context, Widget child,
-                    ImageChunkEvent? loadingProgress) {
-                  if (loadingProgress == null) {
-                    return child;
-                  }
-                  return Center(
-                    child: CircularProgressIndicator(
-                      color: Colors.purple[800],
-                      value: loadingProgress.expectedTotalBytes != null
-                          ? loadingProgress.cumulativeBytesLoaded /
-                              loadingProgress.expectedTotalBytes!
-                          : null,
-                    ),
-                  );
-                },
+              Hero(
+                tag: widget.anuncio.imagem,
+                child: Image.network(
+                  widget.anuncio.imagem,
+                  fit: BoxFit.fill,
+                  width: 100,
+                  height: 100,
+                  errorBuilder: (BuildContext context, Object exception,
+                      StackTrace? stackTrace) {
+                    return Row(
+                      children: [
+                        Icon(Icons.error),
+                        Text("Erro!\nRecarregue\na pagina"),
+                      ],
+                    );
+                  },
+                  loadingBuilder: (BuildContext context, Widget child,
+                      ImageChunkEvent? loadingProgress) {
+                    if (loadingProgress == null) {
+                      return child;
+                    }
+                    return Center(
+                      child: CircularProgressIndicator(
+                        color: Colors.purple[800],
+                        value: loadingProgress.expectedTotalBytes != null
+                            ? loadingProgress.cumulativeBytesLoaded /
+                                loadingProgress.expectedTotalBytes!
+                            : null,
+                      ),
+                    );
+                  },
+                ),
               ),
               Expanded(
                 child: Padding(
@@ -134,7 +141,7 @@ class _AnuncioItemState extends State<AnuncioItem> {
                         ],
                       ),
                       Text(
-                        "R\$ " + widget.anuncio.preco.toString(),
+                        formatter.format(widget.anuncio.preco),
                         style: TextStyle(
                           color: Colors.black,
                           fontFamily: 'RobotoSlab',
