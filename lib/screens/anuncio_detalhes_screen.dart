@@ -142,7 +142,7 @@ class _AnuncioDetalhesScreenState extends State<AnuncioDetalhesScreen> {
                           Expanded(
                             child: _InfoTile(
                                 title: formatter.format(widget.anuncio.preco),
-                                subtitle: 'Preço'),
+                                subtitle: 'Preço unitário'),
                           ),
                         ],
                       ),
@@ -212,7 +212,7 @@ class _AnuncioDetalhesScreenState extends State<AnuncioDetalhesScreen> {
         return SimpleDialog(
           children: [
             Text(
-              "Municípios disponíveis: ",
+              "Disponível para: ",
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 18,

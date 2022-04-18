@@ -609,6 +609,7 @@ class _CidadeDropdownState extends State<CidadeDropdown> {
                 ),
               ),
               searchable: true,
+              searchHint: 'Buscar Município',
               items: _itens!,
               separateSelectedItems: true,
               title: Text("Municípios:"),

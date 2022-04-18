@@ -196,6 +196,7 @@ class _AnunciosListState extends State<AnunciosList> {
                 );
               },
               searchIcon: Icon(Icons.search),
+              searchHint: 'Buscar Município',
               selectedItemsTextStyle: TextStyle(color: Colors.green),
               chipDisplay: MultiSelectChipDisplay(
                 scroll: true,
