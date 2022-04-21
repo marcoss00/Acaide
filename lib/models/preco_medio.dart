@@ -1,6 +1,4 @@
-import 'package:acaide/models/cidades_repository.dart';
-
-class PrecoMedio extends CidadesRepository{
+class PrecoMedio {
   final double preco_medio;
   final String cidade;
   final int quant_anuncio;

@@ -12,7 +12,7 @@ import '../models/cidades_repository.dart';
 List<Anuncio>? anunciosFiltrados = [];
 final CidadesRepository _cidades = CidadesRepository();
 List<Object?> _cidadesSelecionadas = [_cidades.cidadesList[18]];
-bool delayInicio = true;
+bool showTextField = false;
 
 class AnunciosList extends StatefulWidget {
   AnunciosList({Key? key}) : super(key: key);
@@ -35,90 +35,140 @@ class _AnunciosListState extends State<AnunciosList> {
   void initState() {
     super.initState();
     carregarApi();
-    delayInicio = true;
-    Future.delayed(
-        Duration(seconds: 2), () => setState(() => delayInicio = false));
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.purple[800],
-      drawer: Drawer(
-        child: DrawerItem(),
-      ),
+      drawer: (showTextField)
+          ? null
+          : Drawer(
+              child: DrawerItem(),
+            ),
       appBar: AppBar(
-        title: Text(
-          "Feira Virtual de Açaí",
-          style: TextStyle(
-            fontFamily: "Cookie",
-            fontSize: 28.0,
-          ),
-        ),
+        title: (showTextField)
+            ? TextField(
+                onChanged: (busca) => buscaAnuncio(busca),
+                style: TextStyle(
+                  color: Colors.white,
+                ),
+                decoration: InputDecoration(
+                  prefixIcon: Icon(
+                    Icons.search,
+                    color: Colors.white,
+                  ),
+                  suffixIcon: IconButton(
+                    onPressed: () {
+                      setState(() {
+                        showTextField = false;
+                      });
+                    },
+                    icon: Icon(
+                      Icons.cancel,
+                      color: Colors.white,
+                    ),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.white),
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.white),
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  labelText: "Buscar anúncio:",
+                  labelStyle: TextStyle(
+                    color: Colors.white,
+                  ),
+                ),
+              )
+            : Text(
+                "Feira Virtual de Açaí",
+                style: TextStyle(
+                  fontFamily: "Cookie",
+                  fontSize: 28.0,
+                ),
+              ),
         backgroundColor: Colors.purple[800],
         actions: [
-          IconButton(
-            onPressed: () => _showMultiSelect(context),
-            icon: Icon(Icons.location_on),
-          ),
-          IconButton(
-            onPressed: () {},
-            icon: Icon(Icons.search),
-          ),
+          (showTextField)
+              ? Container()
+              : IconButton(
+                  onPressed: () => _showMultiSelect(context),
+                  icon: Icon(Icons.location_on),
+                ),
+          (showTextField)
+              ? Container()
+              : IconButton(
+                  onPressed: () {
+                    setState(() {
+                      showTextField = true;
+                    });
+                  },
+                  icon: Icon(Icons.search),
+                ),
         ],
       ),
-      body: (delayInicio)
-          ? Center(
-              child: CircularProgressIndicator(
-                color: Colors.white,
-              ),
-            )
-          : FutureBuilder<List<Anuncio>>(
-              initialData: [],
-              future: _dao.findAllAnuncio(),
-              builder: (context, snapshot) {
-                switch (snapshot.connectionState) {
-                  case ConnectionState.none:
-                    break;
-                  case ConnectionState.waiting:
-                    return Center(
-                      child: CircularProgressIndicator(
-                        color: Colors.white,
-                      ),
+      body: FutureBuilder<List<Anuncio>>(
+        initialData: [],
+        future: _dao.findAllAnuncio(),
+        builder: (context, snapshot) {
+          switch (snapshot.connectionState) {
+            case ConnectionState.none:
+              break;
+            case ConnectionState.waiting:
+              return Center(
+                child: CircularProgressIndicator(
+                  color: Colors.white,
+                ),
+              );
+            case ConnectionState.active:
+              break;
+            case ConnectionState.done:
+              if (!showTextField) {
+                anunciosFiltrados = filtroCidades(snapshot.data!);
+              }
+              return RefreshIndicator(
+                onRefresh: () => _reloadList(snapshot),
+                child: ListView.builder(
+                  scrollDirection: Axis.vertical,
+                  itemCount: anunciosFiltrados?.length,
+                  itemBuilder: (context, indice) {
+                    final anuncio = anunciosFiltrados![indice];
+                    return Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        AnuncioItem(
+                          anuncio: anuncio,
+                          onLongTap: () {},
+                          botoes: Container(),
+                        ),
+                      ],
                     );
-                  case ConnectionState.active:
-                    break;
-                  case ConnectionState.done:
-                    anunciosFiltrados = filtroCidades(snapshot);
-                    return RefreshIndicator(
-                      onRefresh: () => _reloadList(snapshot),
-                      child: ListView.builder(
-                        scrollDirection: Axis.vertical,
-                        itemCount: anunciosFiltrados?.length,
-                        itemBuilder: (context, indice) {
-                          final anuncio = anunciosFiltrados![indice];
-                          return Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              AnuncioItem(
-                                anuncio: anuncio,
-                                onLongTap: () {},
-                                botoes: Container(),
-                              ),
-                            ],
-                          );
-                        },
-                      ),
-                    );
-                }
-                return Text("Erro desconhecido!");
-              },
-            ),
+                  },
+                ),
+              );
+          }
+          return Text("Erro desconhecido!");
+        },
+      ),
     );
   }
 
-  filtroCidades(AsyncSnapshot<List<Anuncio>> snapshot) {
-    List<Anuncio>? anuncios = snapshot.data;
+  void buscaAnuncio(String query) async {
+    final List<Anuncio> anuncios = filtroCidades(await _dao.findAllAnuncio());
+    final List<Anuncio> busca = anuncios.where((anuncio) {
+      final String tituloAnuncio = anuncio.titulo.toLowerCase();
+      final String saida = query.toLowerCase();
+
+      return tituloAnuncio.contains(saida);
+    }).toList();
+    setState(() => anunciosFiltrados = busca);
+  }
+
+  filtroCidades(List<Anuncio> anuncios) {
+    List<Anuncio> anunciosFiltrados = [];
     List<int> cidadesSelecionadasId = [];
     final Map<String, int> cidadesSelecionadasMap = Map.fromIterable(
         _cidadesSelecionadas,
@@ -127,7 +177,7 @@ class _AnunciosListState extends State<AnunciosList> {
     cidadesSelecionadasMap.forEach((key, value) {
       cidadesSelecionadasId.add(value);
     });
-    for (int i = 0; i < anuncios!.length; i++) {
+    for (int i = 0; i < anuncios.length; i++) {
       bool temCidade = false;
       List<int> cidadesAnuncioId = [];
       final Map<String, int> cidadesAnuncioMap = anuncios[i].cidades;
@@ -141,20 +191,21 @@ class _AnunciosListState extends State<AnunciosList> {
           }
         }
       }
-      if (temCidade == false) {
-        anuncios.remove(anuncios[i]);
-        i = i - 1;
+      if (temCidade) {
+        anunciosFiltrados.add(anuncios[i]);
       }
     }
-    return anuncios;
+    return anunciosFiltrados;
   }
 
   Future<void> _reloadList(AsyncSnapshot snapshot) async {
-    var newList =
-        await Future.delayed(Duration(seconds: 2), () => snapshot.data);
-    setState(() {
-      anunciosFiltrados = filtroCidades(newList);
-    });
+    if (!showTextField) {
+      var newList =
+          await Future.delayed(Duration(seconds: 2), () => snapshot.data);
+      setState(() {
+        anunciosFiltrados = filtroCidades(newList);
+      });
+    }
   }
 
   Future<void> _showMultiSelect(BuildContext context) async {

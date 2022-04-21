@@ -1,6 +1,6 @@
 import 'package:acaide/screens/anuncio_form.dart';
 import 'package:acaide/screens/anuncios_list.dart';
-import 'package:acaide/screens/media_preco_screen.dart';
+import 'package:acaide/screens/preco_medio_screen.dart';
 import 'package:acaide/screens/meu_perfil_screen.dart';
 import 'package:acaide/screens/meus_anuncios_list.dart';
 import 'package:flutter/material.dart';
@@ -153,7 +153,7 @@ class _DrawerItemState extends State<DrawerItem> {
             onTap: () {
               Navigator.of(context).push(
                 MaterialPageRoute(
-                  builder: (context) => MediaPrecoScreen(),
+                  builder: (context) => PrecoMedioScreen(),
                 ),
               );
             },
