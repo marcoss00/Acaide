@@ -21,44 +21,47 @@ class _PrecoMedioScreenState extends State<PrecoMedioScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.purple[800],
-      drawer:Drawer(
-              child: DrawerItem(),
-            ),
+      drawer: Drawer(
+        child: DrawerItem(),
+      ),
       appBar: AppBar(
         centerTitle: true,
         title: (showTextField)
-            ? TextField(
-          onChanged: (busca) => buscaPrecoMedio(busca),
-                style: TextStyle(
-                  color: Colors.white,
-                ),
-                decoration: InputDecoration(
-                  prefixIcon: Icon(
-                    Icons.search,
+            ? Container(
+                height: 40,
+                child: TextField(
+                  onChanged: (busca) => buscaPrecoMedio(busca),
+                  style: TextStyle(
                     color: Colors.white,
                   ),
-                  suffixIcon: IconButton(
-                    onPressed: () {
-                      setState(() {
-                        showTextField = false;
-                      });
-                    },
-                    icon: Icon(
-                      Icons.cancel,
+                  decoration: InputDecoration(
+                    prefixIcon: Icon(
+                      Icons.search,
                       color: Colors.white,
                     ),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.white),
-                    borderRadius: BorderRadius.circular(15),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.white),
-                    borderRadius: BorderRadius.circular(15),
-                  ),
-                  labelText: "Buscar município:",
-                  labelStyle: TextStyle(
-                    color: Colors.white,
+                    suffixIcon: IconButton(
+                      onPressed: () {
+                        setState(() {
+                          showTextField = false;
+                        });
+                      },
+                      icon: Icon(
+                        Icons.cancel_outlined,
+                        color: Colors.white,
+                      ),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.white),
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.white),
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    labelText: "Buscar município:",
+                    labelStyle: TextStyle(
+                      color: Colors.white,
+                    ),
                   ),
                 ),
               )
@@ -105,28 +108,42 @@ class _PrecoMedioScreenState extends State<PrecoMedioScreen> {
             case ConnectionState.active:
               break;
             case ConnectionState.done:
-              if(!showTextField){
+              if (!showTextField) {
                 precosMedio = snapshot.data!;
               }
               return RefreshIndicator(
                 onRefresh: () => _reloadList(snapshot),
-                child: ListView.builder(
-                  scrollDirection: Axis.vertical,
-                  itemCount: precosMedio.length,
-                  itemBuilder: (context, indice) {
-                    final precoMedio = precosMedio[indice];
-                    return Padding(
-                      padding:
-                          const EdgeInsets.only(right: 15, left: 15, top: 15),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          PrecoMedioCard(precoMedio: precoMedio),
-                        ],
+                child: (precosMedio.isEmpty)
+                    ? SingleChildScrollView(
+                        physics: AlwaysScrollableScrollPhysics(),
+                        child: Container(
+                          height: MediaQuery.of(context).size.height,
+                          child: Center(
+                            child: Text(
+                              "Nada encontrado",
+                              style:
+                                  TextStyle(color: Colors.white, fontSize: 20),
+                            ),
+                          ),
+                        ),
+                      )
+                    : ListView.builder(
+                        scrollDirection: Axis.vertical,
+                        itemCount: precosMedio.length,
+                        itemBuilder: (context, indice) {
+                          final precoMedio = precosMedio[indice];
+                          return Padding(
+                            padding: const EdgeInsets.only(
+                                right: 15, left: 15, top: 15),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                PrecoMedioCard(precoMedio: precoMedio),
+                              ],
+                            ),
+                          );
+                        },
                       ),
-                    );
-                  },
-                ),
               );
           }
           return Text("Erro desconhecido!");
@@ -147,9 +164,9 @@ class _PrecoMedioScreenState extends State<PrecoMedioScreen> {
   }
 
   Future<void> _reloadList(AsyncSnapshot snapshot) async {
-    if(!showTextField){
+    if (!showTextField) {
       var newList =
-      await Future.delayed(Duration(seconds: 2), () => snapshot.data);
+          await Future.delayed(Duration(seconds: 2), () => snapshot.data);
       setState(() {
         precosMedio = newList;
       });

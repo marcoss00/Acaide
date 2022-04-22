@@ -38,6 +38,7 @@ dependencies:
   font_awesome_flutter:
   cloud_firestore:
   firebase_storage:
+  firebase_auth:
   firebase_core:
   uuid:
   http:

@@ -9,7 +9,6 @@ import 'package:multi_select_flutter/util/multi_select_item.dart';
 import '../models/cidade.dart';
 import '../models/cidades_repository.dart';
 
-List<Anuncio>? anunciosFiltrados = [];
 final CidadesRepository _cidades = CidadesRepository();
 List<Object?> _cidadesSelecionadas = [_cidades.cidadesList[18]];
 bool showTextField = false;
@@ -22,6 +21,7 @@ class AnunciosList extends StatefulWidget {
 }
 
 class _AnunciosListState extends State<AnunciosList> {
+  List<Anuncio> anunciosFiltrados = [];
   final AnuncioDatabase _dao = AnuncioDatabase();
 
   carregarApi() async {
@@ -48,38 +48,41 @@ class _AnunciosListState extends State<AnunciosList> {
             ),
       appBar: AppBar(
         title: (showTextField)
-            ? TextField(
-                onChanged: (busca) => buscaAnuncio(busca),
-                style: TextStyle(
-                  color: Colors.white,
-                ),
-                decoration: InputDecoration(
-                  prefixIcon: Icon(
-                    Icons.search,
+            ? Container(
+                height: 40,
+                child: TextField(
+                  onChanged: (busca) => buscaAnuncio(busca),
+                  style: TextStyle(
                     color: Colors.white,
                   ),
-                  suffixIcon: IconButton(
-                    onPressed: () {
-                      setState(() {
-                        showTextField = false;
-                      });
-                    },
-                    icon: Icon(
-                      Icons.cancel,
+                  decoration: InputDecoration(
+                    prefixIcon: Icon(
+                      Icons.search,
                       color: Colors.white,
                     ),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.white),
-                    borderRadius: BorderRadius.circular(15),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.white),
-                    borderRadius: BorderRadius.circular(15),
-                  ),
-                  labelText: "Buscar anúncio:",
-                  labelStyle: TextStyle(
-                    color: Colors.white,
+                    suffixIcon: IconButton(
+                      onPressed: () {
+                        setState(() {
+                          showTextField = false;
+                        });
+                      },
+                      icon: Icon(
+                        Icons.cancel_outlined,
+                        color: Colors.white,
+                      ),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.white),
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.white),
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    labelText: "Buscar anúncio:",
+                    labelStyle: TextStyle(
+                      color: Colors.white,
+                    ),
                   ),
                 ),
               )
@@ -131,23 +134,37 @@ class _AnunciosListState extends State<AnunciosList> {
               }
               return RefreshIndicator(
                 onRefresh: () => _reloadList(snapshot),
-                child: ListView.builder(
-                  scrollDirection: Axis.vertical,
-                  itemCount: anunciosFiltrados?.length,
-                  itemBuilder: (context, indice) {
-                    final anuncio = anunciosFiltrados![indice];
-                    return Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        AnuncioItem(
-                          anuncio: anuncio,
-                          onLongTap: () {},
-                          botoes: Container(),
+                child: (anunciosFiltrados.isEmpty)
+                    ? SingleChildScrollView(
+                        physics: AlwaysScrollableScrollPhysics(),
+                        child: Container(
+                          height: MediaQuery.of(context).size.height,
+                          child: Center(
+                            child: Text(
+                              "Nenhum anúncio encontrado",
+                              style:
+                                  TextStyle(color: Colors.white, fontSize: 20),
+                            ),
+                          ),
                         ),
-                      ],
-                    );
-                  },
-                ),
+                      )
+                    : ListView.builder(
+                        scrollDirection: Axis.vertical,
+                        itemCount: anunciosFiltrados.length,
+                        itemBuilder: (context, indice) {
+                          final anuncio = anunciosFiltrados[indice];
+                          return Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              AnuncioItem(
+                                anuncio: anuncio,
+                                onLongTap: () {},
+                                botoes: Container(),
+                              ),
+                            ],
+                          );
+                        },
+                      ),
               );
           }
           return Text("Erro desconhecido!");
@@ -168,34 +185,38 @@ class _AnunciosListState extends State<AnunciosList> {
   }
 
   filtroCidades(List<Anuncio> anuncios) {
-    List<Anuncio> anunciosFiltrados = [];
-    List<int> cidadesSelecionadasId = [];
-    final Map<String, int> cidadesSelecionadasMap = Map.fromIterable(
-        _cidadesSelecionadas,
-        key: (cidade) => cidade.nome,
-        value: (cidade) => cidade.id);
-    cidadesSelecionadasMap.forEach((key, value) {
-      cidadesSelecionadasId.add(value);
-    });
-    for (int i = 0; i < anuncios.length; i++) {
-      bool temCidade = false;
-      List<int> cidadesAnuncioId = [];
-      final Map<String, int> cidadesAnuncioMap = anuncios[i].cidades;
-      cidadesAnuncioMap.forEach((key, value) {
-        cidadesAnuncioId.add(value);
+    if (anuncios.isNotEmpty) {
+      List<Anuncio> anunciosFiltrados = [];
+      List<int> cidadesSelecionadasId = [];
+      final Map<String, int> cidadesSelecionadasMap = Map.fromIterable(
+          _cidadesSelecionadas,
+          key: (cidade) => cidade.nome,
+          value: (cidade) => cidade.id);
+      cidadesSelecionadasMap.forEach((key, value) {
+        cidadesSelecionadasId.add(value);
       });
-      for (int j = 0; j < cidadesSelecionadasId.length; j++) {
-        for (int k = 0; k < cidadesAnuncioId.length; k++) {
-          if (cidadesSelecionadasId[j] == cidadesAnuncioId[k]) {
-            temCidade = true;
+      for (int i = 0; i < anuncios.length; i++) {
+        bool temCidade = false;
+        List<int> cidadesAnuncioId = [];
+        final Map<String, int> cidadesAnuncioMap = anuncios[i].cidades;
+        cidadesAnuncioMap.forEach((key, value) {
+          cidadesAnuncioId.add(value);
+        });
+        for (int j = 0; j < cidadesSelecionadasId.length; j++) {
+          for (int k = 0; k < cidadesAnuncioId.length; k++) {
+            if (cidadesSelecionadasId[j] == cidadesAnuncioId[k]) {
+              temCidade = true;
+            }
           }
         }
+        if (temCidade) {
+          anunciosFiltrados.add(anuncios[i]);
+        }
       }
-      if (temCidade) {
-        anunciosFiltrados.add(anuncios[i]);
-      }
+      return anunciosFiltrados;
+    } else {
+      return anuncios;
     }
-    return anunciosFiltrados;
   }
 
   Future<void> _reloadList(AsyncSnapshot snapshot) async {
