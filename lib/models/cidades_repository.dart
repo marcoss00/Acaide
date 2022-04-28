@@ -16,7 +16,10 @@ class CidadesRepository {
     cidadesList = await getCidadesFromAPI();
     cidadesList.forEach((cidade) {
       cidadeItens.add(DropdownMenuItem(
-        child: Text(cidade.nome.toString()),
+        child: Text(
+          cidade.nome.toString(),
+          overflow: TextOverflow.ellipsis,
+        ),
         value: cidade.id.toString(),
       ));
     });

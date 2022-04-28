@@ -1,14 +1,18 @@
-import 'cidade.dart';
-
 class Usuario {
   final String id;
   final String nome;
   final String email;
-  final Cidade cidade;
+  final Map<String, int> cidade;
   final String telefone;
-  final String senha;
   final String foto_perfil;
+  final String cpf;
 
   Usuario(
-      this.id, this.nome, this.email, this.cidade, this.telefone, this.senha, this.foto_perfil);
+      {required this.id,
+      required this.nome,
+      required this.email,
+      required this.cidade,
+      required this.telefone,
+      required this.foto_perfil,
+      required this.cpf});
 }

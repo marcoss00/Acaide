@@ -15,6 +15,9 @@ class AcaideApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return ScreenUtilInit(builder: (BuildContext context){
       return MaterialApp(
+        theme: ThemeData(
+          unselectedWidgetColor: Colors.white,
+        ),
         home: AnunciosList(),
       );
     },);
