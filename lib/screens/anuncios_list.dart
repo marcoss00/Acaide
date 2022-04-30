@@ -2,6 +2,7 @@ import 'package:acaide/components/anuncio_item.dart';
 import 'package:acaide/components/drawer_item.dart';
 import 'package:acaide/database/anuncio_database.dart';
 import 'package:acaide/models/anuncio.dart';
+import 'package:acaide/models/usuario.dart';
 import 'package:flutter/material.dart';
 import 'package:multi_select_flutter/chip_display/multi_select_chip_display.dart';
 import 'package:multi_select_flutter/dialog/multi_select_dialog_field.dart';
@@ -10,11 +11,13 @@ import '../models/cidade.dart';
 import '../models/cidades_repository.dart';
 
 final CidadesRepository _cidades = CidadesRepository();
-List<Object?> _cidadesSelecionadas = [_cidades.cidadesList[18]];
+List<Object?> _cidadesSelecionadas = [Cidade(nome: "Belém", id: 150142)];//[_cidades.cidadesList[18]];
 bool showTextField = false;
 
 class AnunciosList extends StatefulWidget {
-  AnunciosList({Key? key}) : super(key: key);
+  final Usuario usuario;
+
+  AnunciosList(this.usuario);
 
   @override
   State<AnunciosList> createState() => _AnunciosListState();
@@ -44,7 +47,7 @@ class _AnunciosListState extends State<AnunciosList> {
       drawer: (showTextField)
           ? null
           : Drawer(
-              child: DrawerItem(),
+              child: DrawerItem(widget.usuario),
             ),
       appBar: AppBar(
         title: (showTextField)
@@ -115,7 +118,7 @@ class _AnunciosListState extends State<AnunciosList> {
       ),
       body: FutureBuilder<List<Anuncio>>(
         initialData: [],
-        future: _dao.findAllAnuncio(),
+        future: _dao.findAllAnuncioFiltrado(_cidadesSelecionadas),
         builder: (context, snapshot) {
           switch (snapshot.connectionState) {
             case ConnectionState.none:
@@ -130,7 +133,7 @@ class _AnunciosListState extends State<AnunciosList> {
               break;
             case ConnectionState.done:
               if (!showTextField) {
-                anunciosFiltrados = filtroCidades(snapshot.data!);
+                anunciosFiltrados = snapshot.data!;
               }
               return RefreshIndicator(
                 onRefresh: () => _reloadList(snapshot),
@@ -174,7 +177,7 @@ class _AnunciosListState extends State<AnunciosList> {
   }
 
   void buscaAnuncio(String query) async {
-    final List<Anuncio> anuncios = filtroCidades(await _dao.findAllAnuncio());
+    final List<Anuncio> anuncios = await _dao.findAllAnuncioFiltrado(_cidadesSelecionadas);
     final List<Anuncio> busca = anuncios.where((anuncio) {
       final String tituloAnuncio = anuncio.titulo.toLowerCase();
       final String saida = query.toLowerCase();
@@ -184,47 +187,12 @@ class _AnunciosListState extends State<AnunciosList> {
     setState(() => anunciosFiltrados = busca);
   }
 
-  filtroCidades(List<Anuncio> anuncios) {
-    if (anuncios.isNotEmpty) {
-      List<Anuncio> anunciosFiltrados = [];
-      List<int> cidadesSelecionadasId = [];
-      final Map<String, int> cidadesSelecionadasMap = Map.fromIterable(
-          _cidadesSelecionadas,
-          key: (cidade) => cidade.nome,
-          value: (cidade) => cidade.id);
-      cidadesSelecionadasMap.forEach((key, value) {
-        cidadesSelecionadasId.add(value);
-      });
-      for (int i = 0; i < anuncios.length; i++) {
-        bool temCidade = false;
-        List<int> cidadesAnuncioId = [];
-        final Map<String, int> cidadesAnuncioMap = anuncios[i].cidades;
-        cidadesAnuncioMap.forEach((key, value) {
-          cidadesAnuncioId.add(value);
-        });
-        for (int j = 0; j < cidadesSelecionadasId.length; j++) {
-          for (int k = 0; k < cidadesAnuncioId.length; k++) {
-            if (cidadesSelecionadasId[j] == cidadesAnuncioId[k]) {
-              temCidade = true;
-            }
-          }
-        }
-        if (temCidade) {
-          anunciosFiltrados.add(anuncios[i]);
-        }
-      }
-      return anunciosFiltrados;
-    } else {
-      return anuncios;
-    }
-  }
-
   Future<void> _reloadList(AsyncSnapshot snapshot) async {
     if (!showTextField) {
       var newList =
           await Future.delayed(Duration(seconds: 2), () => snapshot.data);
       setState(() {
-        anunciosFiltrados = filtroCidades(newList);
+        anunciosFiltrados = newList;
       });
     }
   }
@@ -263,7 +231,7 @@ class _AnunciosListState extends State<AnunciosList> {
                 _cidadesSelecionadas = resultado;
                 Navigator.of(context).push(
                   MaterialPageRoute(
-                    builder: (context) => AnunciosList(),
+                    builder: (context) => AnunciosList(widget.usuario),
                   ),
                 );
               },

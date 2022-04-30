@@ -1,3 +1,5 @@
+import 'package:acaide/database/usuario_database.dart';
+import 'package:acaide/models/usuario.dart';
 import 'package:flutter/material.dart';
 import '../models/anuncio.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -10,14 +12,14 @@ NumberFormat formatter = NumberFormat.simpleCurrency(locale: 'pt_BR');
 class AnuncioDetalhesScreen extends StatefulWidget {
   final Anuncio anuncio;
 
-  const AnuncioDetalhesScreen({Key? key, required this.anuncio})
-      : super(key: key);
+  AnuncioDetalhesScreen(this.anuncio);
 
   @override
   State<AnuncioDetalhesScreen> createState() => _AnuncioDetalhesScreenState();
 }
 
 class _AnuncioDetalhesScreenState extends State<AnuncioDetalhesScreen> {
+  final UsuarioDatabase _dao = UsuarioDatabase();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -84,112 +86,134 @@ class _AnuncioDetalhesScreenState extends State<AnuncioDetalhesScreen> {
                 begin: const Offset(0, 30),
                 child: FadeAnimation(
                   intervalStart: 0.4,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Text(
-                        widget.anuncio.titulo,
-                        style: TextStyle(
-                          fontSize: 24.r,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      SizedBox(height: 8.h),
-                      Row(
-                        children: [
-                          // ClipRRect(
-                          //   borderRadius: BorderRadius.circular(100),
-                          //   child: Image.asset(
-                          //     'assets/images/perfil.png',
-                          //     width: 20.r,
-                          //   ),
-                          // ),
-                          // SizedBox(width: 8.h),
-                          (widget.anuncio.tipo_anunciante)
-                              ? Text(
-                                  'Produção própria',
-                                  style: TextStyle(
-                                    color: Colors.black54,
+                  child: FutureBuilder<Usuario>(
+                    future: _dao.findUsuario(widget.anuncio.idUsuario),
+                    builder: (context, snapshot){
+                      switch(snapshot.connectionState){
+                        case ConnectionState.none:
+                          return Center(
+                            child: Text('Nada encontrado. Tente novamente'),
+                          );
+                        case ConnectionState.waiting:
+                          return Center(
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                            ),
+                          );
+                        case ConnectionState.active:
+                          return Center(
+                            child: Text('Conexão incompleta'),
+                          );
+                        case ConnectionState.done:
+                          final Usuario usuario = snapshot.data!;
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              Text(
+                                widget.anuncio.titulo,
+                                style: TextStyle(
+                                  fontSize: 24.r,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              SizedBox(height: 8.h),
+                              Row(
+                                children: [
+                                  // ClipRRect(
+                                  //   borderRadius: BorderRadius.circular(100),
+                                  //   child: Image.asset(
+                                  //     'assets/images/perfil.png',
+                                  //     width: 20.r,
+                                  //   ),
+                                  // ),
+                                  // SizedBox(width: 8.h),
+                                  (widget.anuncio.tipo_anunciante)
+                                      ? Text(
+                                    'Produção própria',
+                                    style: TextStyle(
+                                      color: Colors.black54,
+                                    ),
+                                  )
+                                      : Text(
+                                    'Revendedor',
+                                    style: TextStyle(
+                                      color: Colors.black54,
+                                    ),
                                   ),
-                                )
-                              : Text(
-                                  'Revendedor',
-                                  style: TextStyle(
-                                    color: Colors.black54,
+                                ],
+                              ),
+                              SizedBox(height: 8.h),
+                              Text(
+                                widget.anuncio.descricao,
+                                style: TextStyle(
+                                  fontSize: 14.r,
+                                  height: 1.6,
+                                ),
+                              ),
+                              SizedBox(height: 8.h),
+                              const Divider(),
+                              SizedBox(height: 8.h),
+                              Row(
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.only(right: 90.0),
+                                    child: _InfoTile(
+                                        title: '${widget.anuncio.quant_rasas}',
+                                        subtitle: 'Quantidade de rasas'),
+                                  ),
+                                  Expanded(
+                                    child: _InfoTile(
+                                        title: formatter.format(widget.anuncio.preco),
+                                        subtitle: 'Preço unitário'),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: 16.h),
+                              Row(
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.only(right: 120.0),
+                                    child: _InfoTile(
+                                        title: '3d 5h 23m', subtitle: 'Tempo restante'),
+                                  ),
+                                  _InfoTile(
+                                      title: (widget.anuncio.entrega) ? "Sim" : "Não",
+                                      subtitle: 'Entrega'),
+                                ],
+                              ),
+                              SizedBox(height: 8.h),
+                              ListTile(
+                                contentPadding: EdgeInsets.zero,
+                                leading: ClipRRect(
+                                  borderRadius: BorderRadius.circular(100),
+                                  child: Image.network(
+                                    usuario.foto_perfil,
+                                    width: 40.r,
+                                    height: 40.r,
+                                    fit: BoxFit.cover,
                                   ),
                                 ),
-                        ],
-                      ),
-                      SizedBox(height: 8.h),
-                      Text(
-                        widget.anuncio.descricao,
-                        style: TextStyle(
-                          fontSize: 14.r,
-                          height: 1.6,
-                        ),
-                      ),
-                      SizedBox(height: 8.h),
-                      const Divider(),
-                      SizedBox(height: 8.h),
-                      Row(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(right: 90.0),
-                            child: _InfoTile(
-                                title: '${widget.anuncio.quant_rasas}',
-                                subtitle: 'Quantidade de rasas'),
-                          ),
-                          Expanded(
-                            child: _InfoTile(
-                                title: formatter.format(widget.anuncio.preco),
-                                subtitle: 'Preço unitário'),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 16.h),
-                      Row(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(right: 120.0),
-                            child: _InfoTile(
-                                title: '3d 5h 23m', subtitle: 'Tempo restante'),
-                          ),
-                          _InfoTile(
-                              title: (widget.anuncio.entrega) ? "Sim" : "Não",
-                              subtitle: 'Entrega'),
-                        ],
-                      ),
-                      SizedBox(height: 8.h),
-                      ListTile(
-                        contentPadding: EdgeInsets.zero,
-                        leading: ClipRRect(
-                          borderRadius: BorderRadius.circular(100),
-                          child: Image.asset(
-                            'assets/images/perfil.png',
-                            width: 40.r,
-                            height: 40.r,
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                        title: Text('Marcos Vinicius'),
-                        subtitle: Text(
-                          'Anunciante',
-                          style: TextStyle(
-                            fontSize: 16.r,
-                            color: Colors.black,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        trailing: IconButton(
-                          onPressed: () => _showCidades(context),
-                          icon: Icon(Icons.location_city),
-                        ),
-                      ),
-                      SizedBox(height: 16.h),
-                      Button(),
-                      SizedBox(height: 8.h),
-                    ],
-                  ),
+                                title: Text(usuario.nome),
+                                subtitle: Text(
+                                  'Anunciante',
+                                  style: TextStyle(
+                                    fontSize: 16.r,
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                trailing: IconButton(
+                                  onPressed: () => _showCidades(context),
+                                  icon: Icon(Icons.location_city),
+                                ),
+                              ),
+                              SizedBox(height: 16.h),
+                              Button(usuario),
+                              SizedBox(height: 8.h),
+                            ],
+                          );
+                      }
+                    },),
                 ),
               ),
             ],
@@ -241,12 +265,14 @@ class _AnuncioDetalhesScreenState extends State<AnuncioDetalhesScreen> {
 }
 
 class Button extends StatelessWidget {
-  const Button({Key? key}) : super(key: key);
+  final Usuario usuario;
+
+  Button(this.usuario);
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => _showDialog(context),
+      onTap: () => _showDialog(context, usuario),
       child: Container(
         padding: EdgeInsets.symmetric(
           horizontal: 20.w,
@@ -270,7 +296,7 @@ class Button extends StatelessWidget {
     );
   }
 
-  Future<void> _showDialog(BuildContext context) async {
+  Future<void> _showDialog(BuildContext context, Usuario usuario) async {
     return showDialog<void>(
       context: context,
       barrierDismissible: true,
@@ -283,7 +309,7 @@ class Button extends StatelessWidget {
                 'WhatsApp',
                 style: TextStyle(color: Colors.black),
               ),
-              onPressed: () => abrirWhatsApp("+5591991466493",
+              onPressed: () => abrirWhatsApp("+55${usuario.telefone}",
                   "Olá, tudo bem ? Vi seu anúncio no app Açaíde..."),
             ),
             TextButton.icon(
@@ -292,7 +318,7 @@ class Button extends StatelessWidget {
                 'Ligar',
                 style: TextStyle(color: Colors.black),
               ),
-              onPressed: () => fazerLigacao("91991466493"),
+              onPressed: () => fazerLigacao(usuario.telefone),
             ),
           ],
         );

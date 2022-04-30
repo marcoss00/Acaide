@@ -34,7 +34,7 @@ class _AnuncioItemState extends State<AnuncioItem> {
           Navigator.of(context).push(
             MaterialPageRoute(
               builder: (context) =>
-                  AnuncioDetalhesScreen(anuncio: widget.anuncio),
+                  AnuncioDetalhesScreen(widget.anuncio),
             ),
           );
         },

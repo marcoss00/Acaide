@@ -1,4 +1,5 @@
-import 'package:acaide/screens/anuncios_list.dart';
+import 'package:acaide/main.dart';
+import 'package:acaide/models/usuario.dart';
 import 'package:acaide/screens/reset_password_screen.dart';
 import 'package:acaide/screens/sign_up_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -8,7 +9,9 @@ import '../database/usuario_database.dart';
 bool clicado = false;
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({Key? key}) : super(key: key);
+  final Usuario usuario;
+
+  LoginScreen(this.usuario);
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -154,7 +157,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   onTap: () {
                     Navigator.of(context).push(
                       MaterialPageRoute(
-                        builder: (context) => ResetPasswordScreen(),
+                        builder: (context) => ResetPasswordScreen(widget.usuario),
                       ),
                     );
                   },
@@ -236,7 +239,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   onPressed: () {
                     Navigator.of(context).push(
                       MaterialPageRoute(
-                        builder: (context) => SignUpScreen(),
+                        builder: (context) => SignUpScreen(widget.usuario),
                       ),
                     );
                   },
@@ -283,7 +286,7 @@ class _LoginScreenState extends State<LoginScreen> {
       if (usuario.emailVerified) {
         Navigator.of(context).push(
           MaterialPageRoute(
-            builder: (context) => AnunciosList(),
+            builder: (context) => AcaideApp(),
           ),
         );
       } else {

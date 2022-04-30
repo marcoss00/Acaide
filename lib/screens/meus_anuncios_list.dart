@@ -2,15 +2,17 @@ import 'package:acaide/components/anuncio_item.dart';
 import 'package:acaide/components/drawer_item.dart';
 import 'package:acaide/database/anuncio_database.dart';
 import 'package:acaide/models/anuncio.dart';
+import 'package:acaide/models/usuario.dart';
 import 'package:acaide/screens/anuncio_detalhes_screen.dart';
 import 'package:acaide/screens/anuncio_form.dart';
 import 'package:flutter/material.dart';
 
 List<Anuncio>? anuncios = [];
-bool delayInicio = true;
 
 class MeusAnunciosList extends StatefulWidget {
-  MeusAnunciosList({Key? key}) : super(key: key);
+  final Usuario usuario;
+
+  MeusAnunciosList(this.usuario);
 
   @override
   State<MeusAnunciosList> createState() => _MeusAnunciosListState();
@@ -20,19 +22,11 @@ class _MeusAnunciosListState extends State<MeusAnunciosList> {
   final AnuncioDatabase _dao = AnuncioDatabase();
 
   @override
-  void initState() {
-    super.initState();
-    delayInicio = true;
-    Future.delayed(
-        Duration(seconds: 2), () => setState(() => delayInicio = false));
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.purple[800],
       drawer: Drawer(
-        child: DrawerItem(),
+        child: DrawerItem(widget.usuario),
       ),
       appBar: AppBar(
         centerTitle: true,
@@ -60,20 +54,14 @@ class _MeusAnunciosListState extends State<MeusAnunciosList> {
         onPressed: () {
           Navigator.of(context).push(
             MaterialPageRoute(
-              builder: (context) => AnuncioForm(),
+              builder: (context) => AnuncioForm(widget.usuario),
             ),
           );
         },
       ),
-      body: (delayInicio)
-          ? Center(
-              child: CircularProgressIndicator(
-                color: Colors.white,
-              ),
-            )
-          : FutureBuilder<List<Anuncio>>(
+      body: FutureBuilder<List<Anuncio>>(
               initialData: [],
-              future: _dao.findAllAnuncio(),
+              future: _dao.findAnuncioUsuario(widget.usuario.id),
               builder: (context, snapshot) {
                 switch (snapshot.connectionState) {
                   case ConnectionState.none:
@@ -105,7 +93,7 @@ class _MeusAnunciosListState extends State<MeusAnunciosList> {
                               AnuncioItem(
                                 anuncio: anuncio,
                                 onLongTap: () {
-                                  _showDialog(anuncio);
+                                  _showDialog(anuncio, widget.usuario);
                                 },
                                 botoes: Column(
                                   children: [
@@ -141,7 +129,7 @@ class _MeusAnunciosListState extends State<MeusAnunciosList> {
     });
   }
 
-  Future<void> _showDialog(Anuncio anuncio) async {
+  Future<void> _showDialog(Anuncio anuncio, Usuario usuario) async {
     return showDialog<void>(
       context: context,
       barrierDismissible: true,
@@ -152,7 +140,7 @@ class _MeusAnunciosListState extends State<MeusAnunciosList> {
               onPressed: () {
                 Navigator.of(context).push(
                   MaterialPageRoute(
-                    builder: (context) => AnuncioDetalhesScreen(anuncio: anuncio),
+                    builder: (context) => AnuncioDetalhesScreen(anuncio),
                   ),
                 );
               },
@@ -185,7 +173,7 @@ class _MeusAnunciosListState extends State<MeusAnunciosList> {
               _dao.deleteAnuncio(anuncio);
               Navigator.of(context).push(
                 MaterialPageRoute(
-                  builder: (context) => MeusAnunciosList(),
+                  builder: (context) => MeusAnunciosList(widget.usuario),
                 ),
               );
               ScaffoldMessenger.of(context).showSnackBar(

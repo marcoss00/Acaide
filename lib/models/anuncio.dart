@@ -1,6 +1,6 @@
 class Anuncio {
   final String id;
-  //final String idUsuario;
+  final String idUsuario;
   final String titulo;
   final bool tipo_anunciante;
   final int quant_rasas;
@@ -13,6 +13,7 @@ class Anuncio {
 
   Anuncio(
       {required this.id,
+        required this.idUsuario,
       required this.titulo,
       required this.tipo_anunciante,
       required this.entrega,

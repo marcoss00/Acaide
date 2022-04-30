@@ -2,6 +2,7 @@ import 'package:acaide/components/editor_campo_texto.dart';
 import 'package:acaide/models/anuncio.dart';
 import 'package:acaide/models/cidade.dart';
 import 'package:acaide/models/cidades_repository.dart';
+import 'package:acaide/models/usuario.dart';
 import 'package:acaide/screens/meus_anuncios_list.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
@@ -26,6 +27,10 @@ double total = 0;
 final loading = ValueNotifier<bool>(false);
 
 class AnuncioForm extends StatefulWidget {
+  final Usuario usuario;
+
+  AnuncioForm(this.usuario);
+
   @override
   State<AnuncioForm> createState() => _AnuncioFormState();
 }
@@ -344,6 +349,7 @@ class _AnuncioFormState extends State<AnuncioForm> {
 
     final Anuncio anuncioCriado = Anuncio(
       id: id,
+      idUsuario: widget.usuario.id,
       titulo: controladorCampoTitulo.text,
       tipo_anunciante: tipoAnunciante == TipoAnunciante.producaoPropria,
       entrega: fazEntrega == FazEntrega.entrega,
@@ -360,7 +366,7 @@ class _AnuncioFormState extends State<AnuncioForm> {
           case TaskState.paused:
             Navigator.of(context).push(
               MaterialPageRoute(
-                builder: (context) => MeusAnunciosList(),
+                builder: (context) => MeusAnunciosList(widget.usuario),
               ),
             );
             ScaffoldMessenger.of(context).showSnackBar(
@@ -377,7 +383,7 @@ class _AnuncioFormState extends State<AnuncioForm> {
           case TaskState.success:
             Navigator.of(context).push(
               MaterialPageRoute(
-                builder: (context) => MeusAnunciosList(),
+                builder: (context) => MeusAnunciosList(widget.usuario),
               ),
             );
             ScaffoldMessenger.of(context).showSnackBar(
@@ -389,7 +395,7 @@ class _AnuncioFormState extends State<AnuncioForm> {
           case TaskState.canceled:
             Navigator.of(context).push(
               MaterialPageRoute(
-                builder: (context) => MeusAnunciosList(),
+                builder: (context) => MeusAnunciosList(widget.usuario),
               ),
             );
             ScaffoldMessenger.of(context).showSnackBar(
@@ -401,7 +407,7 @@ class _AnuncioFormState extends State<AnuncioForm> {
           case TaskState.error:
             Navigator.of(context).push(
               MaterialPageRoute(
-                builder: (context) => MeusAnunciosList(),
+                builder: (context) => MeusAnunciosList(widget.usuario),
               ),
             );
             ScaffoldMessenger.of(context).showSnackBar(

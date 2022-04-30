@@ -2,12 +2,16 @@ import 'package:acaide/components/drawer_item.dart';
 import 'package:acaide/components/preco_medio_card.dart';
 import 'package:acaide/database/preco_medio_database.dart';
 import 'package:acaide/models/preco_medio.dart';
+import 'package:acaide/models/usuario.dart';
 import 'package:flutter/material.dart';
 
 bool showTextField = false;
 
 class PrecoMedioScreen extends StatefulWidget {
-  const PrecoMedioScreen({Key? key}) : super(key: key);
+  final Usuario usuario;
+  final bool logado;
+
+  PrecoMedioScreen(this.usuario, this.logado);
 
   @override
   State<PrecoMedioScreen> createState() => _PrecoMedioScreenState();
@@ -22,7 +26,7 @@ class _PrecoMedioScreenState extends State<PrecoMedioScreen> {
     return Scaffold(
       backgroundColor: Colors.purple[800],
       drawer: Drawer(
-        child: DrawerItem(),
+        child: DrawerItem(widget.usuario),
       ),
       appBar: AppBar(
         centerTitle: true,

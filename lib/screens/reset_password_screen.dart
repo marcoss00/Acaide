@@ -1,3 +1,4 @@
+import 'package:acaide/models/usuario.dart';
 import 'package:flutter/material.dart';
 import '../database/usuario_database.dart';
 import 'login_screen.dart';
@@ -5,7 +6,9 @@ import 'login_screen.dart';
 bool clicado = false;
 
 class ResetPasswordScreen extends StatefulWidget {
-  const ResetPasswordScreen({Key? key}) : super(key: key);
+  final Usuario usuario;
+
+  ResetPasswordScreen(this.usuario);
 
   @override
   State<ResetPasswordScreen> createState() => _ResetPasswordScreenState();
@@ -126,7 +129,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                                   setState(() {
                                     clicado = true;
                                   });
-                                  return recuperarSenha();
+                                  return recuperarSenha(widget.usuario);
                                 }
                               },
                         child: (clicado)
@@ -155,7 +158,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
     );
   }
 
-  recuperarSenha() async {
+  recuperarSenha(Usuario usuario) async {
     final bool enviaEmail =
         await _dao.recuperarSenha(controladorCampoEmail.text.trim());
     if (enviaEmail) {
@@ -166,7 +169,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
       );
       Navigator.of(context).push(
         MaterialPageRoute(
-          builder: (context) => LoginScreen(),
+          builder: (context) => LoginScreen(usuario),
         ),
       );
     } else {

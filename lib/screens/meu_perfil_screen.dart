@@ -19,7 +19,7 @@ class _MeuPerfilScreenState extends State<MeuPerfilScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       drawer: Drawer(
-        child: DrawerItem(),
+        child: DrawerItem(widget.usuario),
       ),
       appBar: AppBar(
         centerTitle: true,

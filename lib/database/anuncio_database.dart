@@ -8,6 +8,7 @@ class AnuncioDatabase {
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
   static const String _tableName = 'anuncios';
   static const String _id = 'id';
+  static const String _idUsuario = 'id_usuario';
   static const String _titulo = 'titulo';
   static const String _tipoAnunciante = 'tipo_anunciante';
   static const String _quantRasas = 'quant_rasas';
@@ -18,10 +19,12 @@ class AnuncioDatabase {
   static const String _descricao = 'descricao';
 
   Future saveAnuncio(Anuncio anuncio) async {
-    final DocumentReference save =
-        await firestore.collection(_tableName).doc(anuncio.id);
+    final DocumentReference save = await firestore
+        .collection("/usuarios/${anuncio.idUsuario}/" + _tableName)
+        .doc(anuncio.id);
     final Map<String, dynamic> anuncioMap = {};
     anuncioMap[_id] = anuncio.id;
+    anuncioMap[_idUsuario] = anuncio.idUsuario;
     anuncioMap[_titulo] = anuncio.titulo;
     anuncioMap[_tipoAnunciante] = anuncio.tipo_anunciante;
     anuncioMap[_quantRasas] = anuncio.quant_rasas;
@@ -34,7 +37,85 @@ class AnuncioDatabase {
   }
 
   Future<List<Anuncio>> findAllAnuncio() async {
-    final QuerySnapshot query = await firestore.collection(_tableName).get();
+    final QuerySnapshot queryUser =
+        await firestore.collection("/usuarios").get();
+    final List<Anuncio> anuncios = [];
+    for (var doc in queryUser.docs) {
+      final QuerySnapshot queryAnuncio = await firestore
+          .collection("/usuarios/" + doc.get("id") + "/anuncios")
+          .get();
+      for (var doc in queryAnuncio.docs) {
+        final String urlImagem =
+            await storage.ref(doc.get(_imagem)).getDownloadURL();
+        final Map<dynamic, dynamic> cidades = doc.get(_cidades);
+        final Map<String, int> cidadesConvertido = cidades.cast<String, int>();
+        final Anuncio anuncio = Anuncio(
+          id: doc.get(_id),
+          idUsuario: doc.get(_idUsuario),
+          titulo: doc.get(_titulo),
+          tipo_anunciante: doc.get(_tipoAnunciante),
+          quant_rasas: doc.get(_quantRasas),
+          entrega: doc.get(_entrega),
+          preco: doc.get(_preco),
+          cidades: cidadesConvertido,
+          imagem: urlImagem,
+          descricao: doc.get(_descricao),
+        );
+        anuncios.add(anuncio);
+      }
+    }
+    return anuncios;
+  }
+
+  Future<List<Anuncio>> findAllAnuncioFiltrado(List<Object?> cidadesFiltro) async {
+    final Map<String, int> cidadesSelecionadasMap = Map.fromIterable(
+        cidadesFiltro,
+        key: (cidade) => cidade.nome,
+        value: (cidade) => cidade.id);
+    final QuerySnapshot queryUser =
+        await firestore.collection("/usuarios").get();
+    final List<Anuncio> anuncios = [];
+    for (var doc in queryUser.docs) {
+      final QuerySnapshot queryAnuncio = await firestore
+          .collection("/usuarios/" + doc.get("id") + "/anuncios")
+          .get();
+      for (var doc in queryAnuncio.docs) {
+        bool encontrado = false;
+        final Map<dynamic, dynamic> cidades = doc.get(_cidades);
+        final Map<String, int> cidadesConvertido = cidades.cast<String, int>();
+        cidadesConvertido.forEach((cidadeAnuncio, value) {
+          cidadesSelecionadasMap.forEach((cidadeSelecionada, value) {
+            if(cidadeAnuncio == cidadeSelecionada){
+              encontrado = true;
+            }
+          });
+        });
+        if (encontrado) {
+          final String urlImagem =
+              await storage.ref(doc.get(_imagem)).getDownloadURL();
+          final Anuncio anuncio = Anuncio(
+            id: doc.get(_id),
+            idUsuario: doc.get(_idUsuario),
+            titulo: doc.get(_titulo),
+            tipo_anunciante: doc.get(_tipoAnunciante),
+            quant_rasas: doc.get(_quantRasas),
+            entrega: doc.get(_entrega),
+            preco: doc.get(_preco),
+            cidades: cidadesConvertido,
+            imagem: urlImagem,
+            descricao: doc.get(_descricao),
+          );
+          anuncios.add(anuncio);
+        }
+      }
+    }
+    return anuncios;
+  }
+
+  Future<List<Anuncio>> findAnuncioUsuario(String idUsuario) async {
+    final QuerySnapshot query = await firestore
+        .collection("/usuarios/${idUsuario}/" + _tableName)
+        .get();
     final List<Anuncio> anuncios = [];
     for (var doc in query.docs) {
       final String urlImagem =
@@ -43,6 +124,7 @@ class AnuncioDatabase {
       final Map<String, int> cidadesConvertido = cidades.cast<String, int>();
       final Anuncio anuncio = Anuncio(
         id: doc.get(_id),
+        idUsuario: doc.get(_idUsuario),
         titulo: doc.get(_titulo),
         tipo_anunciante: doc.get(_tipoAnunciante),
         quant_rasas: doc.get(_quantRasas),

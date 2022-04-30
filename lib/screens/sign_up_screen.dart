@@ -23,7 +23,9 @@ bool temFotoPerfil = true;
 bool clicado = false;
 
 class SignUpScreen extends StatefulWidget {
-  const SignUpScreen({Key? key}) : super(key: key);
+  final Usuario usuario;
+
+  SignUpScreen(this.usuario);
 
   @override
   State<SignUpScreen> createState() => _SignUpScreenState();
@@ -122,7 +124,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           if (value.length < 6) {
                             return "Insira pelo menos o seu nome e sobrenome";
                           }
-                          if (value.contains(RegExp(r'[0-9]'))) {
+                          if (value.contains(RegExp(r'\d'))) {
                             return "O nome não pode conter números";
                           }
                           return null;
@@ -465,15 +467,30 @@ class _SignUpScreenState extends State<SignUpScreen> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text("Aviso"),
-            content: Text("Verifique o seu email para concluir o cadastro."),
+            title: Text(
+              "Aviso",
+              style: TextStyle(fontSize: 22),
+            ),
+            content: RichText(
+              text: TextSpan(
+                style: TextStyle(color: Colors.black, fontSize: 20),
+                children: <TextSpan>[
+                  TextSpan(
+                      text: "Verifique o seu email para concluir o cadastro. Não esqueça de verificar a pasta "),
+                  TextSpan(
+                    text: "spam.",
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
+            ),
             actions: [
               TextButton(
                 child: const Text('Ok'),
                 onPressed: () {
                   Navigator.of(context).push(
                     MaterialPageRoute(
-                      builder: (context) => LoginScreen(),
+                      builder: (context) => LoginScreen(widget.usuario),
                     ),
                   );
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -560,6 +577,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
           telefone: telefone,
           foto_perfil: refFoto,
           cpf: cpf);
+      _dao.signOut();
       UploadTask task =
           await _dao.uploadFotoPerfil(_fotoPerfilCortada!.path, refFoto);
       task.snapshotEvents.listen((TaskSnapshot snapshot) async {
@@ -581,7 +599,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
             userFirebase.delete();
             Navigator.of(context).push(
               MaterialPageRoute(
-                builder: (context) => LoginScreen(),
+                builder: (context) => LoginScreen(widget.usuario),
               ),
             );
             ScaffoldMessenger.of(context).showSnackBar(
@@ -594,7 +612,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
             userFirebase.delete();
             Navigator.of(context).push(
               MaterialPageRoute(
-                builder: (context) => LoginScreen(),
+                builder: (context) => LoginScreen(widget.usuario),
               ),
             );
             ScaffoldMessenger.of(context).showSnackBar(
