@@ -4,14 +4,15 @@ import 'package:acaide/database/preco_medio_database.dart';
 import 'package:acaide/models/preco_medio.dart';
 import 'package:acaide/models/usuario.dart';
 import 'package:flutter/material.dart';
+import '../models/cidade.dart';
 
 bool showTextField = false;
 
 class PrecoMedioScreen extends StatefulWidget {
   final Usuario usuario;
-  final bool logado;
+  final List<Cidade> cidades;
 
-  PrecoMedioScreen(this.usuario, this.logado);
+  PrecoMedioScreen(this.usuario, this.cidades);
 
   @override
   State<PrecoMedioScreen> createState() => _PrecoMedioScreenState();
@@ -26,7 +27,7 @@ class _PrecoMedioScreenState extends State<PrecoMedioScreen> {
     return Scaffold(
       backgroundColor: Colors.purple[800],
       drawer: Drawer(
-        child: DrawerItem(widget.usuario),
+        child: DrawerItem(widget.usuario, widget.cidades),
       ),
       appBar: AppBar(
         centerTitle: true,

@@ -1,7 +1,6 @@
 import 'package:acaide/components/editor_campo_texto.dart';
 import 'package:acaide/models/anuncio.dart';
 import 'package:acaide/models/cidade.dart';
-import 'package:acaide/models/cidades_repository.dart';
 import 'package:acaide/models/usuario.dart';
 import 'package:acaide/screens/meus_anuncios_list.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -15,11 +14,9 @@ import '../database/anuncio_database.dart';
 
 File? _fotoAnuncio;
 XFile? pathFotoAnuncio;
-final CidadesRepository _cidades = CidadesRepository();
 final AnuncioDatabase _dao = AnuncioDatabase();
 final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 List<Object?> _cidadesSelecionadas = [];
-List<Cidade>? cidadesList = [];
 FazEntrega fazEntrega = FazEntrega.naoEntrega;
 TipoAnunciante tipoAnunciante = TipoAnunciante.producaoPropria;
 String id = Uuid().v1();
@@ -28,8 +25,9 @@ final loading = ValueNotifier<bool>(false);
 
 class AnuncioForm extends StatefulWidget {
   final Usuario usuario;
+  final List<Cidade> cidades;
 
-  AnuncioForm(this.usuario);
+  AnuncioForm(this.usuario, this.cidades);
 
   @override
   State<AnuncioForm> createState() => _AnuncioFormState();
@@ -285,7 +283,7 @@ class _AnuncioFormState extends State<AnuncioForm> {
                             color: Colors.white,
                           ),
                           Expanded(
-                            child: CidadeDropdown(),
+                            child: CidadeDropdown(widget.cidades),
                           ),
                         ],
                       ),
@@ -366,7 +364,7 @@ class _AnuncioFormState extends State<AnuncioForm> {
           case TaskState.paused:
             Navigator.of(context).push(
               MaterialPageRoute(
-                builder: (context) => MeusAnunciosList(widget.usuario),
+                builder: (context) => MeusAnunciosList(widget.usuario, widget.cidades),
               ),
             );
             ScaffoldMessenger.of(context).showSnackBar(
@@ -383,7 +381,7 @@ class _AnuncioFormState extends State<AnuncioForm> {
           case TaskState.success:
             Navigator.of(context).push(
               MaterialPageRoute(
-                builder: (context) => MeusAnunciosList(widget.usuario),
+                builder: (context) => MeusAnunciosList(widget.usuario, widget.cidades),
               ),
             );
             ScaffoldMessenger.of(context).showSnackBar(
@@ -395,7 +393,7 @@ class _AnuncioFormState extends State<AnuncioForm> {
           case TaskState.canceled:
             Navigator.of(context).push(
               MaterialPageRoute(
-                builder: (context) => MeusAnunciosList(widget.usuario),
+                builder: (context) => MeusAnunciosList(widget.usuario, widget.cidades),
               ),
             );
             ScaffoldMessenger.of(context).showSnackBar(
@@ -407,7 +405,7 @@ class _AnuncioFormState extends State<AnuncioForm> {
           case TaskState.error:
             Navigator.of(context).push(
               MaterialPageRoute(
-                builder: (context) => MeusAnunciosList(widget.usuario),
+                builder: (context) => MeusAnunciosList(widget.usuario, widget.cidades),
               ),
             );
             ScaffoldMessenger.of(context).showSnackBar(
@@ -560,6 +558,10 @@ class _FotoAnuncioState extends State<FotoAnuncio> {
 }
 
 class CidadeDropdown extends StatefulWidget {
+  final List<Cidade> cidades;
+
+  CidadeDropdown(this.cidades);
+
   @override
   State<CidadeDropdown> createState() => _CidadeDropdownState();
 }
@@ -567,73 +569,52 @@ class CidadeDropdown extends StatefulWidget {
 class _CidadeDropdownState extends State<CidadeDropdown> {
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<List<Cidade>>(
-      initialData: [],
-      future: _cidades.getCidadesFromAPI(),
-      builder: (context, snapshot) {
-        switch (snapshot.connectionState) {
-          case ConnectionState.none:
-            break;
-          case ConnectionState.waiting:
-            return Center(
-              child: CircularProgressIndicator(
-                color: Colors.white,
-              ),
-            );
-          case ConnectionState.active:
-            break;
-          case ConnectionState.done:
-            cidadesList = snapshot.data;
-            final _itens = cidadesList
-                ?.map((cidade) => MultiSelectItem<Cidade>(cidade, cidade.nome!))
-                .toList();
-            return MultiSelectBottomSheetField(
-              initialValue: [],
-              validator: (value) {
-                if (value == null || value == []) {
-                  return "Escolha pelo menos um município\npara anunciar";
-                }
-                return null;
-              },
-              decoration: BoxDecoration(
-                color: Colors.purple[800],
-                borderRadius: BorderRadius.all(Radius.circular(40)),
-                border: Border.all(
-                  color: Colors.green,
-                  width: 2,
-                ),
-              ),
-              buttonIcon: Icon(
-                null,
-                color: Colors.white,
-              ),
-              buttonText: Text(
-                "Municípios*",
-                style: TextStyle(
-                  fontSize: 17,
-                  color: Colors.white,
-                ),
-              ),
-              searchable: true,
-              searchHint: 'Buscar Município',
-              items: _itens!,
-              separateSelectedItems: true,
-              title: Text("Municípios:"),
-              selectedColor: Colors.purple,
-              onConfirm: (resultado) {
-                _cidadesSelecionadas = resultado;
-              },
-              searchIcon: Icon(Icons.search),
-              selectedItemsTextStyle: TextStyle(color: Colors.green),
-              chipDisplay: MultiSelectChipDisplay(
-                scroll: true,
-                chipColor: Colors.green,
-                textStyle: TextStyle(color: Colors.white),
-              ),
-            );
+    final _itens = widget.cidades
+        .map((cidade) => MultiSelectItem<Cidade>(cidade, cidade.nome!))
+        .toList();
+    return MultiSelectBottomSheetField(
+      initialValue: [],
+      validator: (value) {
+        if (value == null || value == []) {
+          return "Escolha pelo menos um município\npara anunciar";
         }
-        return Text("Erro desconhecido!");
+        return null;
       },
+      decoration: BoxDecoration(
+        color: Colors.purple[800],
+        borderRadius: BorderRadius.all(Radius.circular(40)),
+        border: Border.all(
+          color: Colors.green,
+          width: 2,
+        ),
+      ),
+      buttonIcon: Icon(
+        null,
+        color: Colors.white,
+      ),
+      buttonText: Text(
+        "Municípios*",
+        style: TextStyle(
+          fontSize: 17,
+          color: Colors.white,
+        ),
+      ),
+      searchable: true,
+      searchHint: 'Buscar Município',
+      items: _itens,
+      separateSelectedItems: true,
+      title: Text("Municípios:"),
+      selectedColor: Colors.purple,
+      onConfirm: (resultado) {
+        _cidadesSelecionadas = resultado;
+      },
+      searchIcon: Icon(Icons.search),
+      selectedItemsTextStyle: TextStyle(color: Colors.green),
+      chipDisplay: MultiSelectChipDisplay(
+        scroll: true,
+        chipColor: Colors.green,
+        textStyle: TextStyle(color: Colors.white),
+      ),
     );
   }
 }

@@ -1,4 +1,5 @@
 import 'package:acaide/main.dart';
+import 'package:acaide/models/cidade.dart';
 import 'package:acaide/models/usuario.dart';
 import 'package:acaide/screens/reset_password_screen.dart';
 import 'package:acaide/screens/sign_up_screen.dart';
@@ -10,8 +11,9 @@ bool clicado = false;
 
 class LoginScreen extends StatefulWidget {
   final Usuario usuario;
+  final List<Cidade> cidades;
 
-  LoginScreen(this.usuario);
+  LoginScreen(this.usuario, this.cidades);
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -157,7 +159,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   onTap: () {
                     Navigator.of(context).push(
                       MaterialPageRoute(
-                        builder: (context) => ResetPasswordScreen(widget.usuario),
+                        builder: (context) => ResetPasswordScreen(widget.usuario, widget.cidades),
                       ),
                     );
                   },
@@ -239,7 +241,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   onPressed: () {
                     Navigator.of(context).push(
                       MaterialPageRoute(
-                        builder: (context) => SignUpScreen(widget.usuario),
+                        builder: (context) => SignUpScreen(widget.usuario, widget.cidades),
                       ),
                     );
                   },

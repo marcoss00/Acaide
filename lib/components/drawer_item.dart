@@ -1,3 +1,4 @@
+import 'package:acaide/models/cidade.dart';
 import 'package:acaide/models/usuario.dart';
 import 'package:acaide/screens/anuncio_form.dart';
 import 'package:acaide/screens/anuncios_list.dart';
@@ -12,8 +13,9 @@ bool logado = false;
 
 class DrawerItem extends StatefulWidget {
   final Usuario usuario;
+  final List<Cidade> cidades;
 
-  DrawerItem(this.usuario);
+  DrawerItem(this.usuario, this.cidades);
 
   @override
   State<DrawerItem> createState() => _DrawerItemState();
@@ -66,7 +68,7 @@ class _DrawerItemState extends State<DrawerItem> {
               onPressed: () {
                 Navigator.of(context).push(
                   MaterialPageRoute(
-                    builder: (context) => LoginScreen(widget.usuario),
+                    builder: (context) => LoginScreen(widget.usuario, widget.cidades),
                   ),
                 );
               },
@@ -100,7 +102,7 @@ class _DrawerItemState extends State<DrawerItem> {
             onTap: () {
               Navigator.of(context).push(
                 MaterialPageRoute(
-                  builder: (context) => AnunciosList(widget.usuario),
+                  builder: (context) => AnunciosList(widget.usuario, widget.cidades),
                 ),
               );
             },
@@ -127,13 +129,13 @@ class _DrawerItemState extends State<DrawerItem> {
               if (logado) {
                 Navigator.of(context).push(
                   MaterialPageRoute(
-                    builder: (context) => AnuncioForm(widget.usuario),
+                    builder: (context) => AnuncioForm(widget.usuario, widget.cidades),
                   ),
                 );
               } else {
                 Navigator.of(context).push(
                   MaterialPageRoute(
-                    builder: (context) => LoginScreen(widget.usuario),
+                    builder: (context) => LoginScreen(widget.usuario, widget.cidades),
                   ),
                 );
               }
@@ -156,13 +158,13 @@ class _DrawerItemState extends State<DrawerItem> {
               if (logado) {
                 Navigator.of(context).push(
                   MaterialPageRoute(
-                    builder: (context) => MeusAnunciosList(widget.usuario),
+                    builder: (context) => MeusAnunciosList(widget.usuario, widget.cidades),
                   ),
                 );
               } else {
                 Navigator.of(context).push(
                   MaterialPageRoute(
-                    builder: (context) => LoginScreen(widget.usuario),
+                    builder: (context) => LoginScreen(widget.usuario, widget.cidades),
                   ),
                 );
               }
@@ -184,7 +186,7 @@ class _DrawerItemState extends State<DrawerItem> {
             onTap: () {
               Navigator.of(context).push(
                 MaterialPageRoute(
-                  builder: (context) => PrecoMedioScreen(widget.usuario, logado),
+                  builder: (context) => PrecoMedioScreen(widget.usuario, widget.cidades),
                 ),
               );
             },
@@ -206,13 +208,13 @@ class _DrawerItemState extends State<DrawerItem> {
               if (logado) {
                 Navigator.of(context).push(
                   MaterialPageRoute(
-                    builder: (context) => MeuPerfilScreen(widget.usuario),
+                    builder: (context) => MeuPerfilScreen(widget.usuario, widget.cidades),
                   ),
                 );
               } else {
                 Navigator.of(context).push(
                   MaterialPageRoute(
-                    builder: (context) => LoginScreen(widget.usuario),
+                    builder: (context) => LoginScreen(widget.usuario, widget.cidades),
                   ),
                 );
               }
@@ -311,7 +313,7 @@ class _DrawerItemState extends State<DrawerItem> {
               _dao.signOut();
               Navigator.of(context).push(
                 MaterialPageRoute(
-                  builder: (context) => AnunciosList(widget.usuario),
+                  builder: (context) => AnunciosList(widget.usuario, widget.cidades),
                 ),
               );
               ScaffoldMessenger.of(context).showSnackBar(

@@ -2,6 +2,7 @@ import 'package:acaide/components/anuncio_item.dart';
 import 'package:acaide/components/drawer_item.dart';
 import 'package:acaide/database/anuncio_database.dart';
 import 'package:acaide/models/anuncio.dart';
+import 'package:acaide/models/cidade.dart';
 import 'package:acaide/models/usuario.dart';
 import 'package:acaide/screens/anuncio_detalhes_screen.dart';
 import 'package:acaide/screens/anuncio_form.dart';
@@ -11,8 +12,9 @@ List<Anuncio>? anuncios = [];
 
 class MeusAnunciosList extends StatefulWidget {
   final Usuario usuario;
+  final List<Cidade> cidades;
 
-  MeusAnunciosList(this.usuario);
+  MeusAnunciosList(this.usuario, this.cidades);
 
   @override
   State<MeusAnunciosList> createState() => _MeusAnunciosListState();
@@ -26,7 +28,7 @@ class _MeusAnunciosListState extends State<MeusAnunciosList> {
     return Scaffold(
       backgroundColor: Colors.purple[800],
       drawer: Drawer(
-        child: DrawerItem(widget.usuario),
+        child: DrawerItem(widget.usuario, widget.cidades),
       ),
       appBar: AppBar(
         centerTitle: true,
@@ -54,7 +56,7 @@ class _MeusAnunciosListState extends State<MeusAnunciosList> {
         onPressed: () {
           Navigator.of(context).push(
             MaterialPageRoute(
-              builder: (context) => AnuncioForm(widget.usuario),
+              builder: (context) => AnuncioForm(widget.usuario, widget.cidades),
             ),
           );
         },
@@ -173,7 +175,7 @@ class _MeusAnunciosListState extends State<MeusAnunciosList> {
               _dao.deleteAnuncio(anuncio);
               Navigator.of(context).push(
                 MaterialPageRoute(
-                  builder: (context) => MeusAnunciosList(widget.usuario),
+                  builder: (context) => MeusAnunciosList(widget.usuario, widget.cidades),
                 ),
               );
               ScaffoldMessenger.of(context).showSnackBar(

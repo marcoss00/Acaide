@@ -11,13 +11,14 @@ import '../models/cidade.dart';
 import '../models/cidades_repository.dart';
 
 final CidadesRepository _cidades = CidadesRepository();
-List<Object?> _cidadesSelecionadas = [Cidade(nome: "Belém", id: 150142)];//[_cidades.cidadesList[18]];
+List<Object?> _cidadesSelecionadas = [];
 bool showTextField = false;
 
 class AnunciosList extends StatefulWidget {
   final Usuario usuario;
+  final List<Cidade> cidades;
 
-  AnunciosList(this.usuario);
+  AnunciosList(this.usuario, this.cidades);
 
   @override
   State<AnunciosList> createState() => _AnunciosListState();
@@ -47,7 +48,7 @@ class _AnunciosListState extends State<AnunciosList> {
       drawer: (showTextField)
           ? null
           : Drawer(
-              child: DrawerItem(widget.usuario),
+              child: DrawerItem(widget.usuario, widget.cidades),
             ),
       appBar: AppBar(
         title: (showTextField)
@@ -177,7 +178,8 @@ class _AnunciosListState extends State<AnunciosList> {
   }
 
   void buscaAnuncio(String query) async {
-    final List<Anuncio> anuncios = await _dao.findAllAnuncioFiltrado(_cidadesSelecionadas);
+    final List<Anuncio> anuncios =
+        await _dao.findAllAnuncioFiltrado(_cidadesSelecionadas);
     final List<Anuncio> busca = anuncios.where((anuncio) {
       final String tituloAnuncio = anuncio.titulo.toLowerCase();
       final String saida = query.toLowerCase();
@@ -231,7 +233,8 @@ class _AnunciosListState extends State<AnunciosList> {
                 _cidadesSelecionadas = resultado;
                 Navigator.of(context).push(
                   MaterialPageRoute(
-                    builder: (context) => AnunciosList(widget.usuario),
+                    builder: (context) =>
+                        AnunciosList(widget.usuario, widget.cidades),
                   ),
                 );
               },

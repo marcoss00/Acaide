@@ -24,8 +24,9 @@ bool clicado = false;
 
 class SignUpScreen extends StatefulWidget {
   final Usuario usuario;
+  final List<Cidade> cidades;
 
-  SignUpScreen(this.usuario);
+  SignUpScreen(this.usuario, this.cidades);
 
   @override
   State<SignUpScreen> createState() => _SignUpScreenState();
@@ -490,7 +491,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 onPressed: () {
                   Navigator.of(context).push(
                     MaterialPageRoute(
-                      builder: (context) => LoginScreen(widget.usuario),
+                      builder: (context) => LoginScreen(widget.usuario, widget.cidades),
                     ),
                   );
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -545,7 +546,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
     Map<String, int> cidadeUsuario = {};
 
-    final List<Cidade> cidadesAPI = await _cidades.getCidadesFromAPI();
+    final List<Cidade> cidadesAPI = widget.cidades;
     cidadesAPI.forEach((element) {
       final int? cidadeId = int.tryParse(cidadeSelecionada!);
       if (element.id == cidadeId) {
@@ -599,7 +600,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
             userFirebase.delete();
             Navigator.of(context).push(
               MaterialPageRoute(
-                builder: (context) => LoginScreen(widget.usuario),
+                builder: (context) => LoginScreen(widget.usuario, widget.cidades),
               ),
             );
             ScaffoldMessenger.of(context).showSnackBar(
@@ -612,7 +613,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
             userFirebase.delete();
             Navigator.of(context).push(
               MaterialPageRoute(
-                builder: (context) => LoginScreen(widget.usuario),
+                builder: (context) => LoginScreen(widget.usuario, widget.cidades),
               ),
             );
             ScaffoldMessenger.of(context).showSnackBar(

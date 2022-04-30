@@ -1,4 +1,5 @@
 import 'package:acaide/components/drawer_item.dart';
+import 'package:acaide/models/cidade.dart';
 import 'package:acaide/models/usuario.dart';
 import 'package:brasil_fields/brasil_fields.dart';
 import 'package:flutter/material.dart';
@@ -7,8 +8,9 @@ final Color textProfileColor = Colors.black87;
 
 class MeuPerfilScreen extends StatefulWidget {
   final Usuario usuario;
+  final List<Cidade> cidades;
 
-  MeuPerfilScreen(this.usuario);
+  MeuPerfilScreen(this.usuario, this.cidades);
 
   @override
   State<MeuPerfilScreen> createState() => _MeuPerfilScreenState();
@@ -19,7 +21,7 @@ class _MeuPerfilScreenState extends State<MeuPerfilScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       drawer: Drawer(
-        child: DrawerItem(widget.usuario),
+        child: DrawerItem(widget.usuario, widget.cidades),
       ),
       appBar: AppBar(
         centerTitle: true,
