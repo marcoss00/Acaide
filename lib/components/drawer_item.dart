@@ -27,7 +27,7 @@ class _DrawerItemState extends State<DrawerItem> {
   @override
   void initState() {
     super.initState();
-    if (_dao.usuarioLogado() == false){
+    if (_dao.usuarioLogado() == false || widget.usuario.id == "id"){
       logado = false;
     }
     else{

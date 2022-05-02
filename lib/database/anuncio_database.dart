@@ -17,6 +17,10 @@ class AnuncioDatabase {
   static const String _cidades = 'cidades';
   static const String _imagem = 'image';
   static const String _descricao = 'descricao';
+  static const String _dataCriacao = 'data_criacao';
+  static const String _fotoPerfilUsuario = 'foto_perfil_usuario';
+  static const String _nomeUsuario = 'nome_usuario';
+  static const String _telefoneUsuario = 'telefone_usuario';
 
   Future saveAnuncio(Anuncio anuncio) async {
     final DocumentReference save = await firestore
@@ -33,6 +37,10 @@ class AnuncioDatabase {
     anuncioMap[_cidades] = anuncio.cidades;
     anuncioMap[_imagem] = anuncio.imagem;
     anuncioMap[_descricao] = anuncio.descricao;
+    anuncioMap[_dataCriacao] = anuncio.dataCriacao;
+    anuncioMap[_fotoPerfilUsuario] = anuncio.fotoPerfilUsuario;
+    anuncioMap[_nomeUsuario] = anuncio.nomeUsuario;
+    anuncioMap[_telefoneUsuario] = anuncio.telefoneUsuario;
     return save.set(anuncioMap);
   }
 
@@ -47,8 +55,11 @@ class AnuncioDatabase {
       for (var doc in queryAnuncio.docs) {
         final String urlImagem =
             await storage.ref(doc.get(_imagem)).getDownloadURL();
+        final String urlFotoPerfilUsuario =
+            await storage.ref(doc.get(_fotoPerfilUsuario)).getDownloadURL();
         final Map<dynamic, dynamic> cidades = doc.get(_cidades);
         final Map<String, int> cidadesConvertido = cidades.cast<String, int>();
+        final Timestamp dataCriacaoConvertido = doc.get(_dataCriacao);
         final Anuncio anuncio = Anuncio(
           id: doc.get(_id),
           idUsuario: doc.get(_idUsuario),
@@ -60,14 +71,35 @@ class AnuncioDatabase {
           cidades: cidadesConvertido,
           imagem: urlImagem,
           descricao: doc.get(_descricao),
+          dataCriacao: dataCriacaoConvertido.toDate(),
+          fotoPerfilUsuario: urlFotoPerfilUsuario,
+          nomeUsuario: doc.get(_nomeUsuario),
+          telefoneUsuario: doc.get(_telefoneUsuario),
         );
-        anuncios.add(anuncio);
+        final dataAtual = DateTime.now();
+        final dataInicioAnuncio = dataCriacaoConvertido.toDate();
+        final dataFimAnuncio = DateTime.utc(
+          dataInicioAnuncio.year,
+          dataInicioAnuncio.month,
+          dataInicioAnuncio.day + 1,
+          dataInicioAnuncio.hour,
+          dataInicioAnuncio.minute,
+          dataInicioAnuncio.second,
+          dataInicioAnuncio.millisecond,
+          dataInicioAnuncio.microsecond,
+        );
+        if(dataAtual.isAfter(dataFimAnuncio)){
+          await deleteAnuncio(anuncio);
+        }else{
+          anuncios.add(anuncio);
+        }
       }
     }
     return anuncios;
   }
 
-  Future<List<Anuncio>> findAllAnuncioFiltrado(List<Object?> cidadesFiltro) async {
+  Future<List<Anuncio>> findAllAnuncioFiltrado(
+      List<Object?> cidadesFiltro) async {
     final Map<String, int> cidadesSelecionadasMap = Map.fromIterable(
         cidadesFiltro,
         key: (cidade) => cidade.nome,
@@ -85,7 +117,7 @@ class AnuncioDatabase {
         final Map<String, int> cidadesConvertido = cidades.cast<String, int>();
         cidadesConvertido.forEach((cidadeAnuncio, value) {
           cidadesSelecionadasMap.forEach((cidadeSelecionada, value) {
-            if(cidadeAnuncio == cidadeSelecionada){
+            if (cidadeAnuncio == cidadeSelecionada) {
               encontrado = true;
             }
           });
@@ -93,6 +125,9 @@ class AnuncioDatabase {
         if (encontrado) {
           final String urlImagem =
               await storage.ref(doc.get(_imagem)).getDownloadURL();
+          final Timestamp dataCriacaoConvertido = doc.get(_dataCriacao);
+          final String urlFotoPerfilUsuario =
+              await storage.ref(doc.get(_fotoPerfilUsuario)).getDownloadURL();
           final Anuncio anuncio = Anuncio(
             id: doc.get(_id),
             idUsuario: doc.get(_idUsuario),
@@ -104,8 +139,28 @@ class AnuncioDatabase {
             cidades: cidadesConvertido,
             imagem: urlImagem,
             descricao: doc.get(_descricao),
+            dataCriacao: dataCriacaoConvertido.toDate(),
+            fotoPerfilUsuario: urlFotoPerfilUsuario,
+            nomeUsuario: doc.get(_nomeUsuario),
+            telefoneUsuario: doc.get(_telefoneUsuario),
           );
-          anuncios.add(anuncio);
+          final dataAtual = DateTime.now();
+          final dataInicioAnuncio = dataCriacaoConvertido.toDate();
+          final dataFimAnuncio = DateTime.utc(
+            dataInicioAnuncio.year,
+            dataInicioAnuncio.month,
+            dataInicioAnuncio.day + 1,
+            dataInicioAnuncio.hour,
+            dataInicioAnuncio.minute,
+            dataInicioAnuncio.second,
+            dataInicioAnuncio.millisecond,
+            dataInicioAnuncio.microsecond,
+          );
+          if(dataAtual.isAfter(dataFimAnuncio)){
+            await deleteAnuncio(anuncio);
+          }else{
+            anuncios.add(anuncio);
+          }
         }
       }
     }
@@ -122,6 +177,9 @@ class AnuncioDatabase {
           await storage.ref(doc.get(_imagem)).getDownloadURL();
       final Map<dynamic, dynamic> cidades = doc.get(_cidades);
       final Map<String, int> cidadesConvertido = cidades.cast<String, int>();
+      final Timestamp dataCriacaoConvertido = doc.get(_dataCriacao);
+      final String urlFotoPerfilUsuario =
+          await storage.ref(doc.get(_fotoPerfilUsuario)).getDownloadURL();
       final Anuncio anuncio = Anuncio(
         id: doc.get(_id),
         idUsuario: doc.get(_idUsuario),
@@ -133,8 +191,30 @@ class AnuncioDatabase {
         cidades: cidadesConvertido,
         imagem: urlImagem,
         descricao: doc.get(_descricao),
+        dataCriacao: dataCriacaoConvertido.toDate(),
+        fotoPerfilUsuario: urlFotoPerfilUsuario,
+        nomeUsuario: doc.get(_nomeUsuario),
+        telefoneUsuario: doc.get(_telefoneUsuario),
       );
-      anuncios.add(anuncio);
+      final dataAtual = DateTime.now();
+      final dataInicioAnuncio = dataCriacaoConvertido.toDate();
+      final dataFimAnuncio = DateTime.utc(
+        dataInicioAnuncio.year,
+        dataInicioAnuncio.month,
+        dataInicioAnuncio.day + 1,
+        dataInicioAnuncio.hour,
+        dataInicioAnuncio.minute,
+        dataInicioAnuncio.second,
+        dataInicioAnuncio.millisecond,
+        dataInicioAnuncio.microsecond,
+      );
+      print(dataAtual);
+      print(dataFimAnuncio);
+      if(dataAtual.isAfter(dataFimAnuncio)){
+        await deleteAnuncio(anuncio);
+      }else{
+        anuncios.add(anuncio);
+      }
     }
     return anuncios;
   }
@@ -152,5 +232,10 @@ class AnuncioDatabase {
     final delete = await firestore.collection(_tableName).doc(anuncio.id);
     await storage.refFromURL(anuncio.imagem).delete();
     return delete.delete();
+  }
+
+  Future getRef(String url) async {
+    final String ref = await storage.refFromURL(url).fullPath;
+    return ref;
   }
 }

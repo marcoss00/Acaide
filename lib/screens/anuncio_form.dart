@@ -344,6 +344,8 @@ class _AnuncioFormState extends State<AnuncioForm> {
         "imagensAnuncio/img-${DateTime.now().toString()}.jpg";
     final Map<String, int> cidadesMap = Map.fromIterable(_cidadesSelecionadas,
         key: (cidade) => cidade.nome, value: (cidade) => cidade.id);
+    final DateTime dataCriacao = DateTime.now();
+    final String refFotoPerfilUsuario = await _dao.getRef(widget.usuario.foto_perfil);
 
     final Anuncio anuncioCriado = Anuncio(
       id: id,
@@ -356,6 +358,10 @@ class _AnuncioFormState extends State<AnuncioForm> {
       imagem: refImagem,
       quant_rasas: quantSaca!,
       descricao: controladorCampoDescricao.text,
+      dataCriacao: dataCriacao,
+      fotoPerfilUsuario: refFotoPerfilUsuario,
+      nomeUsuario: widget.usuario.nome,
+      telefoneUsuario: widget.usuario.telefone,
     );
     if (file != null) {
       UploadTask task = await _dao.uploadImagemAnuncio(file.path, refImagem);
@@ -364,7 +370,8 @@ class _AnuncioFormState extends State<AnuncioForm> {
           case TaskState.paused:
             Navigator.of(context).push(
               MaterialPageRoute(
-                builder: (context) => MeusAnunciosList(widget.usuario, widget.cidades),
+                builder: (context) =>
+                    MeusAnunciosList(widget.usuario, widget.cidades),
               ),
             );
             ScaffoldMessenger.of(context).showSnackBar(
@@ -381,7 +388,8 @@ class _AnuncioFormState extends State<AnuncioForm> {
           case TaskState.success:
             Navigator.of(context).push(
               MaterialPageRoute(
-                builder: (context) => MeusAnunciosList(widget.usuario, widget.cidades),
+                builder: (context) =>
+                    MeusAnunciosList(widget.usuario, widget.cidades),
               ),
             );
             ScaffoldMessenger.of(context).showSnackBar(
@@ -393,7 +401,8 @@ class _AnuncioFormState extends State<AnuncioForm> {
           case TaskState.canceled:
             Navigator.of(context).push(
               MaterialPageRoute(
-                builder: (context) => MeusAnunciosList(widget.usuario, widget.cidades),
+                builder: (context) =>
+                    MeusAnunciosList(widget.usuario, widget.cidades),
               ),
             );
             ScaffoldMessenger.of(context).showSnackBar(
@@ -405,7 +414,8 @@ class _AnuncioFormState extends State<AnuncioForm> {
           case TaskState.error:
             Navigator.of(context).push(
               MaterialPageRoute(
-                builder: (context) => MeusAnunciosList(widget.usuario, widget.cidades),
+                builder: (context) =>
+                    MeusAnunciosList(widget.usuario, widget.cidades),
               ),
             );
             ScaffoldMessenger.of(context).showSnackBar(
