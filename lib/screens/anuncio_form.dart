@@ -3,8 +3,10 @@ import 'package:acaide/models/anuncio.dart';
 import 'package:acaide/models/cidade.dart';
 import 'package:acaide/models/usuario.dart';
 import 'package:acaide/screens/meus_anuncios_list.dart';
+import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 import 'package:multi_select_flutter/multi_select_flutter.dart';
@@ -15,13 +17,13 @@ import '../database/anuncio_database.dart';
 File? _fotoAnuncio;
 XFile? pathFotoAnuncio;
 final AnuncioDatabase _dao = AnuncioDatabase();
-final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 List<Object?> _cidadesSelecionadas = [];
 FazEntrega fazEntrega = FazEntrega.naoEntrega;
 TipoAnunciante tipoAnunciante = TipoAnunciante.producaoPropria;
 String id = Uuid().v1();
 double total = 0;
 final loading = ValueNotifier<bool>(false);
+bool temImagem = true;
 
 class AnuncioForm extends StatefulWidget {
   final Usuario usuario;
@@ -44,6 +46,8 @@ class _AnuncioFormState extends State<AnuncioForm> {
   final TextEditingController controladorCampoPrecoRasa =
       TextEditingController();
 
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
   void atualizaCounterTextTitulo() {
     setState(() {
       controladorCampoTitulo.text;
@@ -59,16 +63,14 @@ class _AnuncioFormState extends State<AnuncioForm> {
   @override
   void initState() {
     super.initState();
-    setState(() {
-      loading.value = false;
-      _fotoAnuncio = null;
-      id = Uuid().v1();
-      controladorCampoDescricao.addListener(atualizaCounterTextDescricao);
-      controladorCampoTitulo.addListener(atualizaCounterTextTitulo);
-      _cidadesSelecionadas = [];
-      fazEntrega = FazEntrega.naoEntrega;
-      tipoAnunciante = TipoAnunciante.producaoPropria;
-    });
+    controladorCampoDescricao.addListener(atualizaCounterTextDescricao);
+    controladorCampoTitulo.addListener(atualizaCounterTextTitulo);
+    _fotoAnuncio = null;
+    id = Uuid().v1();
+    _cidadesSelecionadas = [];
+    fazEntrega = FazEntrega.naoEntrega;
+    tipoAnunciante = TipoAnunciante.producaoPropria;
+    setState(() => loading.value = false);
   }
 
   @override
@@ -110,6 +112,19 @@ class _AnuncioFormState extends State<AnuncioForm> {
                 child: Column(
                   children: [
                     FotoAnuncio(),
+                    (temImagem)
+                        ? Container()
+                        : Padding(
+                            padding: const EdgeInsets.only(top: 6),
+                            child: Text(
+                              "Insira uma imagem para o anúncio",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: Colors.red,
+                                fontSize: 13,
+                              ),
+                            ),
+                          ),
                     Padding(
                       padding: const EdgeInsets.only(top: 20.0),
                       child: EditorCampoTexto(
@@ -186,6 +201,9 @@ class _AnuncioFormState extends State<AnuncioForm> {
                     Padding(
                       padding: const EdgeInsets.only(top: 20),
                       child: TextFormField(
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly,
+                        ],
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return "É obrigatório informar a quantidade de rasas\n no anúncio";
@@ -193,9 +211,6 @@ class _AnuncioFormState extends State<AnuncioForm> {
                           final int? quantTelas = int.tryParse(value);
                           if (quantTelas! < 1) {
                             return "Quantidade inválida";
-                          }
-                          if (quantTelas >= 1000) {
-                            return "Quantidade muito elevada";
                           }
                           return null;
                         },
@@ -231,16 +246,15 @@ class _AnuncioFormState extends State<AnuncioForm> {
                     Padding(
                       padding: const EdgeInsets.only(top: 20),
                       child: TextFormField(
+                        inputFormatters: [
+                          CurrencyTextInputFormatter(
+                            locale: 'br',
+                            symbol: 'R\$',
+                          ),
+                        ],
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return "É obrigatório informar o preço das rasas\n no anúncio";
-                          }
-                          final int? precoRasas = int.tryParse(value);
-                          if (precoRasas! < 0) {
-                            return "Preço inválido";
-                          }
-                          if (precoRasas >= 1000) {
-                            return "Preço muito elevado";
                           }
                           return null;
                         },
@@ -250,7 +264,7 @@ class _AnuncioFormState extends State<AnuncioForm> {
                           color: Colors.white,
                         ),
                         decoration: InputDecoration(
-                          hintText: "Ex: R\$ 90,00",
+                          hintText: "Ex: 90,00 R\$",
                           hintStyle: TextStyle(color: Colors.white),
                           labelText: "Preço de cada Rasa*",
                           labelStyle: TextStyle(
@@ -297,7 +311,16 @@ class _AnuncioFormState extends State<AnuncioForm> {
                   onPressed: (loading.value)
                       ? () => null
                       : () {
-                          if (_formKey.currentState!.validate()) {
+                          if (_fotoAnuncio == null) {
+                            setState(() {
+                              temImagem = false;
+                            });
+                          } else {
+                            setState(() => temImagem = true);
+                          }
+                          if (_formKey.currentState!.validate() &&
+                              _fotoAnuncio != null &&
+                              _cidadesSelecionadas != []) {
                             loading.value = !loading.value;
                             return uploadFotoAnuncio(context);
                           }
@@ -339,13 +362,18 @@ class _AnuncioFormState extends State<AnuncioForm> {
   uploadFotoAnuncio(BuildContext context) async {
     XFile? file = await pathFotoAnuncio;
     final int? quantSaca = int.tryParse(controladorCampoQuantidadeRasas.text);
-    final double? preco = double.tryParse(controladorCampoPrecoRasa.text);
+    final String precoRasa = controladorCampoPrecoRasa.text.replaceAll(" ", "");
+    final String precoRasa2 = precoRasa.replaceAll(',', '.');
+    final String precoRasa3 = precoRasa2.replaceAll('R\$', '');
+    print(precoRasa3);
+    final double? preco = double.tryParse(precoRasa3);
     final String refImagem =
         "imagensAnuncio/img-${DateTime.now().toString()}.jpg";
     final Map<String, int> cidadesMap = Map.fromIterable(_cidadesSelecionadas,
         key: (cidade) => cidade.nome, value: (cidade) => cidade.id);
     final DateTime dataCriacao = DateTime.now();
-    final String refFotoPerfilUsuario = await _dao.getRef(widget.usuario.foto_perfil);
+    final String refFotoPerfilUsuario =
+        await _dao.getRef(widget.usuario.foto_perfil);
 
     final Anuncio anuncioCriado = Anuncio(
       id: id,
@@ -585,7 +613,10 @@ class _CidadeDropdownState extends State<CidadeDropdown> {
     return MultiSelectBottomSheetField(
       initialValue: [],
       validator: (value) {
-        if (value == null || value == []) {
+        if (value == null ||
+            value == [] ||
+            value.toString() == "" ||
+            value.isEmpty) {
           return "Escolha pelo menos um município\npara anunciar";
         }
         return null;

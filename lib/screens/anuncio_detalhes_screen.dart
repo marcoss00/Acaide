@@ -44,13 +44,14 @@ class _AnuncioDetalhesScreenState extends State<AnuncioDetalhesScreen> {
   void initState() {
     super.initState();
     final DateTime horarioAtual = DateTime.now();
-    print(widget.anuncio.dataCriacao);
-    print(horarioAtual);
     if (horarioAtual.second < widget.anuncio.dataCriacao.second) {
       segundos = widget.anuncio.dataCriacao.second - horarioAtual.second;
     } else if (horarioAtual.second == widget.anuncio.dataCriacao.second &&
         horarioAtual.day != widget.anuncio.dataCriacao.day) {
       segundos = 0;
+    } else if (horarioAtual.second == widget.anuncio.dataCriacao.second &&
+        horarioAtual.day == widget.anuncio.dataCriacao.day) {
+      segundos = 59 - (horarioAtual.second - widget.anuncio.dataCriacao.second);
     } else {
       segundos = maxSegundos -
           (horarioAtual.second - widget.anuncio.dataCriacao.second);
@@ -60,6 +61,9 @@ class _AnuncioDetalhesScreenState extends State<AnuncioDetalhesScreen> {
     } else if (horarioAtual.minute == widget.anuncio.dataCriacao.minute &&
         horarioAtual.day != widget.anuncio.dataCriacao.day) {
       minutos = 0;
+    } else if (horarioAtual.minute == widget.anuncio.dataCriacao.minute &&
+        horarioAtual.day == widget.anuncio.dataCriacao.day) {
+      minutos = 59 - (horarioAtual.minute - widget.anuncio.dataCriacao.minute);
     } else {
       minutos = maxMinutos -
           (horarioAtual.minute - widget.anuncio.dataCriacao.minute);
@@ -69,6 +73,9 @@ class _AnuncioDetalhesScreenState extends State<AnuncioDetalhesScreen> {
     } else if (horarioAtual.hour == widget.anuncio.dataCriacao.hour &&
         horarioAtual.day != widget.anuncio.dataCriacao.day) {
       horas = 0;
+    } else if (horarioAtual.hour == widget.anuncio.dataCriacao.hour &&
+        horarioAtual.day == widget.anuncio.dataCriacao.day) {
+      horas = 23 - (horarioAtual.hour - widget.anuncio.dataCriacao.hour);
     } else {
       horas = maxHoras - (horarioAtual.hour - widget.anuncio.dataCriacao.hour);
     }

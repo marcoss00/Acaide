@@ -8,6 +8,7 @@ class EditorCampoTexto extends StatelessWidget {
   final String? dica;
   final String? rotulo;
   final IconData? icone;
+  final String? valorInicial;
 
 
   EditorCampoTexto(
@@ -17,11 +18,13 @@ class EditorCampoTexto extends StatelessWidget {
       this.counterText,
       this.dica,
       this.rotulo,
-      this.icone});
+      this.icone,
+      this.valorInicial});
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      initialValue: valorInicial,
       validator: validador,
       controller: controlador,
       keyboardType: teclado != null ? TextInputType.text : null,

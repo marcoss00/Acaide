@@ -9,6 +9,7 @@ import 'package:acaide/screens/anuncio_form.dart';
 import 'package:flutter/material.dart';
 
 List<Anuncio>? anuncios = [];
+bool delayInicio = true;
 
 class MeusAnunciosList extends StatefulWidget {
   final Usuario usuario;
@@ -22,6 +23,14 @@ class MeusAnunciosList extends StatefulWidget {
 
 class _MeusAnunciosListState extends State<MeusAnunciosList> {
   final AnuncioDatabase _dao = AnuncioDatabase();
+
+  @override
+  void initState() {
+    super.initState();
+    delayInicio = true;
+    Future.delayed(
+        Duration(seconds: 2), () => setState(() => delayInicio = false));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -61,7 +70,13 @@ class _MeusAnunciosListState extends State<MeusAnunciosList> {
           );
         },
       ),
-      body: FutureBuilder<List<Anuncio>>(
+      body: (delayInicio)
+          ? Center(
+              child: CircularProgressIndicator(
+                color: Colors.white,
+              ),
+            )
+          : FutureBuilder<List<Anuncio>>(
               initialData: [],
               future: _dao.findAnuncioUsuario(widget.usuario.id),
               builder: (context, snapshot) {
@@ -175,7 +190,8 @@ class _MeusAnunciosListState extends State<MeusAnunciosList> {
               _dao.deleteAnuncio(anuncio);
               Navigator.of(context).push(
                 MaterialPageRoute(
-                  builder: (context) => MeusAnunciosList(widget.usuario, widget.cidades),
+                  builder: (context) =>
+                      MeusAnunciosList(widget.usuario, widget.cidades),
                 ),
               );
               ScaffoldMessenger.of(context).showSnackBar(
