@@ -88,9 +88,9 @@ class AnuncioDatabase {
           dataInicioAnuncio.millisecond,
           dataInicioAnuncio.microsecond,
         );
-        if(dataAtual.isAfter(dataFimAnuncio)){
+        if (dataAtual.isAfter(dataFimAnuncio)) {
           deleteAnuncio(anuncio);
-        }else{
+        } else {
           anuncios.add(anuncio);
         }
       }
@@ -156,9 +156,9 @@ class AnuncioDatabase {
             dataInicioAnuncio.millisecond,
             dataInicioAnuncio.microsecond,
           );
-          if(dataAtual.isAfter(dataFimAnuncio)){
+          if (dataAtual.isAfter(dataFimAnuncio)) {
             deleteAnuncio(anuncio);
-          }else{
+          } else {
             anuncios.add(anuncio);
           }
         }
@@ -208,9 +208,9 @@ class AnuncioDatabase {
         dataInicioAnuncio.millisecond,
         dataInicioAnuncio.microsecond,
       );
-      if(dataAtual.isAfter(dataFimAnuncio)){
+      if (dataAtual.isAfter(dataFimAnuncio)) {
         deleteAnuncio(anuncio);
-      }else{
+      } else {
         anuncios.add(anuncio);
       }
     }
@@ -227,9 +227,15 @@ class AnuncioDatabase {
   }
 
   Future deleteAnuncio(Anuncio anuncio) async {
-    final delete = await firestore.collection("/usuarios/${anuncio.idUsuario}/" + _tableName).doc(anuncio.id);
+    final delete = await firestore
+        .collection("/usuarios/${anuncio.idUsuario}/" + _tableName)
+        .doc(anuncio.id);
     await storage.refFromURL(anuncio.imagem).delete();
     return delete.delete();
+  }
+
+  Future deleteImagemAnuncio(String url) async {
+    return await storage.refFromURL(url).delete();
   }
 
   Future getRef(String url) async {

@@ -4,6 +4,7 @@ import 'package:acaide/database/anuncio_database.dart';
 import 'package:acaide/models/anuncio.dart';
 import 'package:acaide/models/usuario.dart';
 import 'package:flutter/material.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:multi_select_flutter/chip_display/multi_select_chip_display.dart';
 import 'package:multi_select_flutter/dialog/multi_select_dialog_field.dart';
 import 'package:multi_select_flutter/util/multi_select_item.dart';
@@ -13,6 +14,9 @@ import '../models/cidades_repository.dart';
 final CidadesRepository _cidades = CidadesRepository();
 List<Object?> _cidadesSelecionadas = [];
 bool showTextField = false;
+bool primeira = true;
+bool primeiraAd = true;
+bool delayInicio = true;
 
 class AnunciosList extends StatefulWidget {
   final Usuario usuario;
@@ -27,9 +31,76 @@ class AnunciosList extends StatefulWidget {
 class _AnunciosListState extends State<AnunciosList> {
   List<Anuncio> anunciosFiltrados = [];
   final AnuncioDatabase _dao = AnuncioDatabase();
+  bool bannerCarregado = false;
+  late final BannerAd myBanner;
+  late final InterstitialAd myInterstitial;
+
+  void carregarBanner() {
+    myBanner = BannerAd(
+      adUnitId: 'ca-app-pub-3940256099942544/6300978111',
+      size: AdSize(width: 320, height: 50),
+      request: AdRequest(),
+      listener: BannerAdListener(
+        // Called when an ad is successfully received.
+        onAdLoaded: (Ad ad) {
+          print('Ad loaded.');
+          setState(() => bannerCarregado = true);
+        },
+        // Called when an ad request failed.
+        onAdFailedToLoad: (Ad ad, LoadAdError error) {
+          // Dispose the ad here to free resources.
+          ad.dispose();
+          print('Ad failed to load: $error');
+        },
+        // Called when an ad opens an overlay that covers the screen.
+        onAdOpened: (Ad ad) => print('Ad opened.'),
+        // Called when an ad removes an overlay that covers the screen.
+        onAdClosed: (Ad ad) => print('Ad closed.'),
+        // Called when an impression occurs on the ad.
+        onAdImpression: (Ad ad) => print('Ad impression.'),
+      ),
+    );
+
+    myBanner.load();
+  }
+
+  void carregarAdTelaCheia(){
+    InterstitialAd.load(
+        adUnitId: 'ca-app-pub-3940256099942544/1033173712',
+        request: AdRequest(),
+        adLoadCallback: InterstitialAdLoadCallback(
+          onAdLoaded: (InterstitialAd ad) {
+            // Keep a reference to the ad so you can show it later.
+            myInterstitial = ad;
+            if(primeiraAd){
+              primeiraAd = false;
+              myInterstitial.show();
+            }
+            myInterstitial.fullScreenContentCallback = FullScreenContentCallback(
+              onAdDismissedFullScreenContent: (ad) {
+                myInterstitial.dispose();
+              },
+              onAdFailedToShowFullScreenContent: (ad, error) {
+                myInterstitial.dispose();
+              },
+            );
+          },
+          onAdFailedToLoad: (LoadAdError error) {
+            print('InterstitialAd failed to load: $error');
+          },
+        ));
+  }
 
   carregarApi() async {
     var cidadesList = await _cidades.getCidadesFromAPI();
+    if (primeira) {
+      primeira = false;
+      cidadesList.forEach((element) {
+        if (element.id == widget.usuario.cidade.values.first) {
+          _cidadesSelecionadas.add(element);
+        }
+      });
+    }
     return cidadesList;
     //função feita apenas pra carregar api das cidades junto com a screen.
     //Não precisa retornar "cidadesList", mas coloquei pra retornar só pra não ficar o aviso que a variavel n ta sendo usada.
@@ -38,7 +109,11 @@ class _AnunciosListState extends State<AnunciosList> {
   @override
   void initState() {
     super.initState();
+    carregarBanner();
+    carregarAdTelaCheia();
     carregarApi();
+    Future.delayed(
+        Duration(seconds: 2), () => setState(() => delayInicio = false));
   }
 
   @override
@@ -117,63 +192,77 @@ class _AnunciosListState extends State<AnunciosList> {
                 ),
         ],
       ),
-      body: FutureBuilder<List<Anuncio>>(
-        initialData: [],
-        future: _dao.findAllAnuncioFiltrado(_cidadesSelecionadas),
-        builder: (context, snapshot) {
-          switch (snapshot.connectionState) {
-            case ConnectionState.none:
-              break;
-            case ConnectionState.waiting:
-              return Center(
-                child: CircularProgressIndicator(
-                  color: Colors.white,
-                ),
-              );
-            case ConnectionState.active:
-              break;
-            case ConnectionState.done:
-              if (!showTextField) {
-                anunciosFiltrados = snapshot.data!;
-              }
-              return RefreshIndicator(
-                onRefresh: () => _reloadList(snapshot),
-                child: (anunciosFiltrados.isEmpty)
-                    ? SingleChildScrollView(
-                        physics: AlwaysScrollableScrollPhysics(),
-                        child: Container(
-                          height: MediaQuery.of(context).size.height,
-                          child: Center(
-                            child: Text(
-                              "Nenhum anúncio encontrado",
-                              style:
-                                  TextStyle(color: Colors.white, fontSize: 20),
-                            ),
-                          ),
-                        ),
-                      )
-                    : ListView.builder(
-                        scrollDirection: Axis.vertical,
-                        itemCount: anunciosFiltrados.length,
-                        itemBuilder: (context, indice) {
-                          final anuncio = anunciosFiltrados[indice];
-                          return Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              AnuncioItem(
-                                anuncio: anuncio,
-                                onLongTap: () {},
-                                botoes: Container(),
-                              ),
-                            ],
-                          );
-                        },
+      bottomNavigationBar: (bannerCarregado)
+          ? Container(
+              height: 50,
+              width: 320,
+              child: AdWidget(ad: myBanner),
+            )
+          : Container(),
+      body: (delayInicio)
+          ? Center(
+              child: CircularProgressIndicator(
+                color: Colors.white,
+              ),
+            )
+          : FutureBuilder<List<Anuncio>>(
+              initialData: [],
+              future: _dao.findAllAnuncioFiltrado(_cidadesSelecionadas),
+              builder: (context, snapshot) {
+                switch (snapshot.connectionState) {
+                  case ConnectionState.none:
+                    break;
+                  case ConnectionState.waiting:
+                    return Center(
+                      child: CircularProgressIndicator(
+                        color: Colors.white,
                       ),
-              );
-          }
-          return Text("Erro desconhecido!");
-        },
-      ),
+                    );
+                  case ConnectionState.active:
+                    break;
+                  case ConnectionState.done:
+                    if (!showTextField) {
+                      anunciosFiltrados = snapshot.data!;
+                    }
+                    return RefreshIndicator(
+                      onRefresh: () => _reloadList(snapshot),
+                      child: (anunciosFiltrados.isEmpty)
+                          ? SingleChildScrollView(
+                              physics: AlwaysScrollableScrollPhysics(),
+                              child: Container(
+                                height: MediaQuery.of(context).size.height,
+                                child: Center(
+                                  child: Text(
+                                    "Nenhum anúncio encontrado",
+                                    style: TextStyle(
+                                        color: Colors.white, fontSize: 20),
+                                  ),
+                                ),
+                              ),
+                            )
+                          : ListView.builder(
+                              scrollDirection: Axis.vertical,
+                              itemCount: anunciosFiltrados.length,
+                              itemBuilder: (context, indice) {
+                                final anuncio = anunciosFiltrados[indice];
+                                return Column(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    AnuncioItem(
+                                      anuncio: anuncio,
+                                      onLongTap: () {},
+                                      botoes: Container(),
+                                    ),
+                                  ],
+                                );
+                              },
+                            ),
+                    );
+                }
+                return Text("Erro desconhecido!");
+              },
+            ),
     );
   }
 

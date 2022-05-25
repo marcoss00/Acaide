@@ -6,6 +6,7 @@ import 'package:acaide/models/cidade.dart';
 import 'package:acaide/models/usuario.dart';
 import 'package:acaide/screens/anuncio_detalhes_screen.dart';
 import 'package:acaide/screens/anuncio_form.dart';
+import 'package:acaide/screens/anuncio_form_edicao.dart';
 import 'package:flutter/material.dart';
 
 List<Anuncio>? anuncios = [];
@@ -110,12 +111,20 @@ class _MeusAnunciosListState extends State<MeusAnunciosList> {
                               AnuncioItem(
                                 anuncio: anuncio,
                                 onLongTap: () {
-                                  _showDialog(anuncio, widget.usuario);
+                                  _showDialog(anuncio);
                                 },
                                 botoes: Column(
                                   children: [
                                     IconButton(
-                                      onPressed: () {},
+                                      onPressed: () {
+                                        final String preco = anuncio.preco.toString().replaceAll(".", ",");
+                                        final String precoRaza = "${preco} R\$";
+                                        Navigator.of(context).push(
+                                          MaterialPageRoute(
+                                            builder: (context) => AnuncioFormEdicao(widget.usuario, widget.cidades, anuncio, precoRaza),
+                                          ),
+                                        );
+                                      },
                                       icon: Icon(Icons.edit),
                                       color: Colors.yellow,
                                     ),
@@ -146,7 +155,7 @@ class _MeusAnunciosListState extends State<MeusAnunciosList> {
     });
   }
 
-  Future<void> _showDialog(Anuncio anuncio, Usuario usuario) async {
+  Future<void> _showDialog(Anuncio anuncio) async {
     return showDialog<void>(
       context: context,
       barrierDismissible: true,
@@ -164,7 +173,15 @@ class _MeusAnunciosListState extends State<MeusAnunciosList> {
               child: Text("Visualizar"),
             ),
             SimpleDialogOption(
-              onPressed: () {},
+              onPressed: () {
+                final String preco = anuncio.preco.toString().replaceAll(".", ",");
+                final String precoRaza = "${preco} R\$";
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => AnuncioFormEdicao(widget.usuario, widget.cidades, anuncio, precoRaza),
+                  ),
+                );
+              },
               child: Text("Editar"),
             ),
             SimpleDialogOption(

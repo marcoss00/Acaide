@@ -7,6 +7,7 @@ import 'package:currency_text_input_formatter/currency_text_input_formatter.dart
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 import 'package:multi_select_flutter/multi_select_flutter.dart';
@@ -47,6 +48,32 @@ class _AnuncioFormState extends State<AnuncioForm> {
       TextEditingController();
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  late final InterstitialAd myInterstitial;
+  bool adTelaCheiaCarregado = false;
+
+  void carregarAdTelaCheia(){
+    InterstitialAd.load(
+        adUnitId: 'ca-app-pub-3940256099942544/8691691433',
+        request: AdRequest(),
+        adLoadCallback: InterstitialAdLoadCallback(
+          onAdLoaded: (InterstitialAd ad) {
+            // Keep a reference to the ad so you can show it later.
+            adTelaCheiaCarregado = true;
+            myInterstitial = ad;
+            myInterstitial.fullScreenContentCallback = FullScreenContentCallback(
+              onAdDismissedFullScreenContent: (ad) {
+                myInterstitial.dispose();
+              },
+              onAdFailedToShowFullScreenContent: (ad, error) {
+                myInterstitial.dispose();
+              },
+            );
+          },
+          onAdFailedToLoad: (LoadAdError error) {
+            print('InterstitialAd failed to load: $error');
+          },
+        ));
+  }
 
   void atualizaCounterTextTitulo() {
     setState(() {
@@ -322,6 +349,7 @@ class _AnuncioFormState extends State<AnuncioForm> {
                               _fotoAnuncio != null &&
                               _cidadesSelecionadas != []) {
                             loading.value = !loading.value;
+                            carregarAdTelaCheia();
                             return uploadFotoAnuncio(context);
                           }
                         },
@@ -365,7 +393,6 @@ class _AnuncioFormState extends State<AnuncioForm> {
     final String precoRasa = controladorCampoPrecoRasa.text.replaceAll(" ", "");
     final String precoRasa2 = precoRasa.replaceAll(',', '.');
     final String precoRasa3 = precoRasa2.replaceAll('R\$', '');
-    print(precoRasa3);
     final double? preco = double.tryParse(precoRasa3);
     final String refImagem =
         "imagensAnuncio/img-${DateTime.now().toString()}.jpg";
@@ -414,6 +441,9 @@ class _AnuncioFormState extends State<AnuncioForm> {
             });
             break;
           case TaskState.success:
+            if(adTelaCheiaCarregado){
+              myInterstitial.show();
+            }
             Navigator.of(context).push(
               MaterialPageRoute(
                 builder: (context) =>

@@ -27,10 +27,9 @@ class _DrawerItemState extends State<DrawerItem> {
   @override
   void initState() {
     super.initState();
-    if (_dao.usuarioLogado() == false || widget.usuario.id == "id"){
+    if (_dao.usuarioLogado() == false || widget.usuario.id == "id") {
       logado = false;
-    }
-    else{
+    } else {
       logado = true;
     }
   }
@@ -42,67 +41,67 @@ class _DrawerItemState extends State<DrawerItem> {
       children: [
         (logado == true)
             ? UserAccountsDrawerHeader(
-          decoration: BoxDecoration(color: Colors.purple[800]),
-          accountEmail: Text(
-            widget.usuario.email,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-          accountName: Text(
-            widget.usuario.nome,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-          currentAccountPicture: CircleAvatar(
-            backgroundImage:
-            NetworkImage(widget.usuario.foto_perfil),
-          ),
-        )
+                decoration: BoxDecoration(color: Colors.purple[800]),
+                accountEmail: Text(
+                  widget.usuario.email,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                accountName: Text(
+                  widget.usuario.nome,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                currentAccountPicture: CircleAvatar(
+                  backgroundImage: NetworkImage(widget.usuario.foto_perfil),
+                ),
+              )
             : SizedBox(
-          height: 100,
-          child: DrawerHeader(
-            decoration: BoxDecoration(
-              color: Colors.purple[800],
-            ),
-            child: ElevatedButton.icon(
-              onPressed: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => LoginScreen(widget.usuario, widget.cidades),
+                height: 100,
+                child: DrawerHeader(
+                  decoration: BoxDecoration(
+                    color: Colors.purple[800],
                   ),
-                );
-              },
-              icon: Icon(
-                Icons.login,
-                size: 30,
-                color: Colors.black54,
-              ),
-              label: Text(
-                "Entrar",
-                style: TextStyle(
-                  color: Colors.black54,
-                  fontSize: 20,
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              LoginScreen(widget.usuario, widget.cidades),
+                        ),
+                      );
+                    },
+                    icon: Icon(
+                      Icons.login,
+                      size: 30,
+                      color: Colors.black54,
+                    ),
+                    label: Text(
+                      "Entrar",
+                      style: TextStyle(
+                        color: Colors.black54,
+                        fontSize: 20,
+                      ),
+                    ),
+                    style: ButtonStyle(
+                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                        RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(50),
+                        ),
+                      ),
+                      backgroundColor: MaterialStateProperty.all<Color>(
+                          Color.fromARGB(255, 255, 240, 255)),
+                    ),
+                  ),
                 ),
               ),
-              style: ButtonStyle(
-                shape: MaterialStateProperty.all<
-                    RoundedRectangleBorder>(
-                  RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(50),
-                  ),
-                ),
-                backgroundColor: MaterialStateProperty.all<Color>(
-                    Color.fromARGB(255, 255, 240, 255)),
-              ),
-            ),
-          ),
-        ),
         Material(
           child: InkWell(
             onTap: () {
               Navigator.of(context).push(
                 MaterialPageRoute(
-                  builder: (context) => AnunciosList(widget.usuario, widget.cidades),
+                  builder: (context) =>
+                      AnunciosList(widget.usuario, widget.cidades),
                 ),
               );
             },
@@ -129,13 +128,15 @@ class _DrawerItemState extends State<DrawerItem> {
               if (logado) {
                 Navigator.of(context).push(
                   MaterialPageRoute(
-                    builder: (context) => AnuncioForm(widget.usuario, widget.cidades),
+                    builder: (context) =>
+                        AnuncioForm(widget.usuario, widget.cidades),
                   ),
                 );
               } else {
                 Navigator.of(context).push(
                   MaterialPageRoute(
-                    builder: (context) => LoginScreen(widget.usuario, widget.cidades),
+                    builder: (context) =>
+                        LoginScreen(widget.usuario, widget.cidades),
                   ),
                 );
               }
@@ -158,13 +159,15 @@ class _DrawerItemState extends State<DrawerItem> {
               if (logado) {
                 Navigator.of(context).push(
                   MaterialPageRoute(
-                    builder: (context) => MeusAnunciosList(widget.usuario, widget.cidades),
+                    builder: (context) =>
+                        MeusAnunciosList(widget.usuario, widget.cidades),
                   ),
                 );
               } else {
                 Navigator.of(context).push(
                   MaterialPageRoute(
-                    builder: (context) => LoginScreen(widget.usuario, widget.cidades),
+                    builder: (context) =>
+                        LoginScreen(widget.usuario, widget.cidades),
                   ),
                 );
               }
@@ -186,7 +189,8 @@ class _DrawerItemState extends State<DrawerItem> {
             onTap: () {
               Navigator.of(context).push(
                 MaterialPageRoute(
-                  builder: (context) => PrecoMedioScreen(widget.usuario, widget.cidades),
+                  builder: (context) =>
+                      PrecoMedioScreen(widget.usuario, widget.cidades),
                 ),
               );
             },
@@ -208,13 +212,15 @@ class _DrawerItemState extends State<DrawerItem> {
               if (logado) {
                 Navigator.of(context).push(
                   MaterialPageRoute(
-                    builder: (context) => MeuPerfilScreen(widget.usuario, widget.cidades),
+                    builder: (context) =>
+                        MeuPerfilScreen(widget.usuario, widget.cidades),
                   ),
                 );
               } else {
                 Navigator.of(context).push(
                   MaterialPageRoute(
-                    builder: (context) => LoginScreen(widget.usuario, widget.cidades),
+                    builder: (context) =>
+                        LoginScreen(widget.usuario, widget.cidades),
                   ),
                 );
               }
@@ -233,20 +239,20 @@ class _DrawerItemState extends State<DrawerItem> {
         ),
         (logado == true)
             ? Material(
-          child: InkWell(
-            onTap: () => _signoutDialog(widget.usuario),
-            child: ListTile(
-              leading: Icon(
-                Icons.arrow_back,
-                color: Colors.purple[800],
-              ),
-              title: Text(
-                "Sair",
-                style: TextStyle(fontSize: 18),
-              ),
-            ),
-          ),
-        )
+                child: InkWell(
+                  onTap: () => _signoutDialog(widget.usuario),
+                  child: ListTile(
+                    leading: Icon(
+                      Icons.arrow_back,
+                      color: Colors.purple[800],
+                    ),
+                    title: Text(
+                      "Sair",
+                      style: TextStyle(fontSize: 18),
+                    ),
+                  ),
+                ),
+              )
             : Container(),
         Divider(
           color: (logado == true) ? Colors.black : null,
@@ -313,7 +319,8 @@ class _DrawerItemState extends State<DrawerItem> {
               _dao.signOut();
               Navigator.of(context).push(
                 MaterialPageRoute(
-                  builder: (context) => AnunciosList(widget.usuario, widget.cidades),
+                  builder: (context) =>
+                      AnunciosList(widget.usuario, widget.cidades),
                 ),
               );
               ScaffoldMessenger.of(context).showSnackBar(

@@ -4,6 +4,7 @@ import 'package:acaide/database/preco_medio_database.dart';
 import 'package:acaide/models/preco_medio.dart';
 import 'package:acaide/models/usuario.dart';
 import 'package:flutter/material.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import '../models/cidade.dart';
 
 bool showTextField = false;
@@ -21,6 +22,43 @@ class PrecoMedioScreen extends StatefulWidget {
 class _PrecoMedioScreenState extends State<PrecoMedioScreen> {
   final PrecoMedioDatabase _dao = PrecoMedioDatabase();
   List<PrecoMedio> precosMedio = [];
+  bool bannerCarregado = false;
+  late final BannerAd myBanner;
+
+  void carregarBanner() {
+    myBanner = BannerAd(
+      adUnitId: 'ca-app-pub-3940256099942544/6300978111',
+      size: AdSize(width: 320, height: 50),
+      request: AdRequest(),
+      listener: BannerAdListener(
+        // Called when an ad is successfully received.
+        onAdLoaded: (Ad ad) {
+          print('Ad loaded.');
+          setState(() => bannerCarregado = true);
+        },
+        // Called when an ad request failed.
+        onAdFailedToLoad: (Ad ad, LoadAdError error) {
+          // Dispose the ad here to free resources.
+          ad.dispose();
+          print('Ad failed to load: $error');
+        },
+        // Called when an ad opens an overlay that covers the screen.
+        onAdOpened: (Ad ad) => print('Ad opened.'),
+        // Called when an ad removes an overlay that covers the screen.
+        onAdClosed: (Ad ad) => print('Ad closed.'),
+        // Called when an impression occurs on the ad.
+        onAdImpression: (Ad ad) => print('Ad impression.'),
+      ),
+    );
+
+    myBanner.load();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    carregarBanner();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -97,6 +135,13 @@ class _PrecoMedioScreenState extends State<PrecoMedioScreen> {
                 ),
         ],
       ),
+      bottomNavigationBar: (bannerCarregado)
+          ? Container(
+              height: 50,
+              width: 320,
+              child: AdWidget(ad: myBanner),
+            )
+          : Container(),
       body: FutureBuilder<List<PrecoMedio>>(
         initialData: [],
         future: _dao.findAllPrecoMedio(),
