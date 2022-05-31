@@ -51,6 +51,7 @@ class AnuncioDatabase {
     for (var doc in queryUser.docs) {
       final QuerySnapshot queryAnuncio = await firestore
           .collection("/usuarios/" + doc.get("id") + "/anuncios")
+          .orderBy("data_criacao", descending: true)
           .get();
       for (var doc in queryAnuncio.docs) {
         final String urlImagem =
@@ -95,6 +96,9 @@ class AnuncioDatabase {
         }
       }
     }
+    anuncios.sort((a, b) {
+      return b.dataCriacao.compareTo(a.dataCriacao);
+    });
     return anuncios;
   }
 
@@ -110,6 +114,7 @@ class AnuncioDatabase {
     for (var doc in queryUser.docs) {
       final QuerySnapshot queryAnuncio = await firestore
           .collection("/usuarios/" + doc.get("id") + "/anuncios")
+          .orderBy("data_criacao", descending: true)
           .get();
       for (var doc in queryAnuncio.docs) {
         bool encontrado = false;
@@ -164,12 +169,16 @@ class AnuncioDatabase {
         }
       }
     }
+    anuncios.sort((a, b) {
+      return b.dataCriacao.compareTo(a.dataCriacao);
+    });
     return anuncios;
   }
 
   Future<List<Anuncio>> findAnuncioUsuario(String idUsuario) async {
     final QuerySnapshot query = await firestore
         .collection("/usuarios/${idUsuario}/" + _tableName)
+        .orderBy("data_criacao", descending: true)
         .get();
     final List<Anuncio> anuncios = [];
     for (var doc in query.docs) {

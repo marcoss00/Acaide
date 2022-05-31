@@ -282,6 +282,8 @@ class _AnuncioFormState extends State<AnuncioForm> {
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return "É obrigatório informar o preço das rasas\n no anúncio";
+                          } else if (value.length > 9) {
+                            return "Preço muito elevado";
                           }
                           return null;
                         },

@@ -257,51 +257,51 @@ class _DrawerItemState extends State<DrawerItem> {
         Divider(
           color: (logado == true) ? Colors.black : null,
         ),
-        Material(
-          child: InkWell(
-            onTap: () {},
-            child: ListTile(
-              leading: Icon(
-                Icons.help,
-                color: Colors.purple[800],
-              ),
-              title: Text(
-                "Ajuda",
-                style: TextStyle(fontSize: 18),
-              ),
-            ),
-          ),
-        ),
-        Material(
-          child: InkWell(
-            onTap: () {},
-            child: ListTile(
-              leading: Icon(
-                Icons.bug_report,
-                color: Colors.purple[800],
-              ),
-              title: Text(
-                "Reportar Erro",
-                style: TextStyle(fontSize: 18),
-              ),
-            ),
-          ),
-        ),
-        Material(
-          child: InkWell(
-            onTap: () {},
-            child: ListTile(
-              leading: Icon(
-                Icons.announcement,
-                color: Colors.purple[800],
-              ),
-              title: Text(
-                "Sobre",
-                style: TextStyle(fontSize: 18),
-              ),
-            ),
-          ),
-        ),
+        // Material(
+        //   child: InkWell(
+        //     onTap: () {},
+        //     child: ListTile(
+        //       leading: Icon(
+        //         Icons.help,
+        //         color: Colors.purple[800],
+        //       ),
+        //       title: Text(
+        //         "Ajuda",
+        //         style: TextStyle(fontSize: 18),
+        //       ),
+        //     ),
+        //   ),
+        // ),
+        // Material(
+        //   child: InkWell(
+        //     onTap: () {},
+        //     child: ListTile(
+        //       leading: Icon(
+        //         Icons.bug_report,
+        //         color: Colors.purple[800],
+        //       ),
+        //       title: Text(
+        //         "Reportar Erro",
+        //         style: TextStyle(fontSize: 18),
+        //       ),
+        //     ),
+        //   ),
+        // ),
+        // Material(
+        //   child: InkWell(
+        //     onTap: () {},
+        //     child: ListTile(
+        //       leading: Icon(
+        //         Icons.announcement,
+        //         color: Colors.purple[800],
+        //       ),
+        //       title: Text(
+        //         "Sobre",
+        //         style: TextStyle(fontSize: 18),
+        //       ),
+        //     ),
+        //   ),
+        // ),
       ],
     );
   }

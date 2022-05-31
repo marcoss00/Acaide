@@ -33,6 +33,19 @@ class UsuarioDatabase {
     }
   }
 
+  Future atualizarEmail({required String email}) async {
+    User? user;
+    try {
+      user = await auth.currentUser;
+      await user?.updateEmail(email);
+      user?.sendEmailVerification();
+      return user;
+    } catch (e) {
+      print(e.toString());
+      return false;
+    }
+  }
+
   Future cadastroEmailSenha({
     required String senha,
     required String email,
@@ -71,7 +84,7 @@ class UsuarioDatabase {
   Future<Usuario> findUsuario(String idUser) async {
     final query = await firestore.collection(_tableName).doc(idUser).get();
     final String urlImagem =
-    await storage.ref(query.get(_fotoPerfil)).getDownloadURL();
+        await storage.ref(query.get(_fotoPerfil)).getDownloadURL();
     final Map<dynamic, dynamic> cidade = query.get(_cidade);
     final Map<String, int> cidadeConvertido = cidade.cast<String, int>();
     final Usuario usuario = Usuario(
@@ -122,8 +135,8 @@ class UsuarioDatabase {
     }
   }
 
-  Future deleteFotoPerfil(String foto_perfil) async {
-    return await storage.ref(foto_perfil).delete();
+  Future deleteFotoPerfil(String url) async {
+    return await storage.refFromURL(url).delete();
   }
 
   Future deleteUsuarioFirestore(Usuario usuario) async {

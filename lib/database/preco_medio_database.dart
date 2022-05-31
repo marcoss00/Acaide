@@ -11,6 +11,7 @@ class PrecoMedioDatabase {
   Future<List<PrecoMedio>> findAllPrecoMedio() async {
     final List<Anuncio> anuncios = await _dao.findAllAnuncio();
     final List<Cidade> cidades = await apiCidades.getCidadesFromAPI();
+    print(cidades[0].nome);
     final List<PrecoMedio> precosMedio = [];
     List<double> somaPreco = [];
     List<int> quant_anuncio = [];
@@ -38,6 +39,9 @@ class PrecoMedioDatabase {
           quant_anuncio: quant_anuncio[i]);
       precosMedio.add(precoMedio);
     }
+    precosMedio.sort((a, b) {
+      return b.preco_medio.compareTo(a.preco_medio);
+    });
     return precosMedio;
   }
 }

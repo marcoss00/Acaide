@@ -3,6 +3,7 @@ import 'package:acaide/models/cidade.dart';
 import 'package:acaide/models/usuario.dart';
 import 'package:brasil_fields/brasil_fields.dart';
 import 'package:flutter/material.dart';
+import 'meu_perfil_edicao.dart';
 
 final Color textProfileColor = Colors.black87;
 
@@ -35,7 +36,14 @@ class _MeuPerfilScreenState extends State<MeuPerfilScreen> {
         backgroundColor: Colors.purple[800],
         actions: [
           IconButton(
-            onPressed: () {},
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) =>
+                      MeuPerfilEdicao(widget.usuario, widget.cidades),
+                ),
+              );
+            },
             icon: Icon(Icons.edit_outlined),
           ),
         ],
