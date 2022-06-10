@@ -1,0 +1,29 @@
+ajeitar bug do multi_select ao clicar no cancel;
+
+configurar regras bd firebase;
+
+App funcionar apenas se o usuario estiver conectado a internet.
+
+laziloading listview
+
+atualizar informações do usuario no anúncio quando o usuario atualizar suas informações.
+
+Media Aritimetica ou Ponderada;
+
+Registro de software;
+
+Como salvar o preço medio no firebase;
+
+tela de ajuda, reportar erro e sobre;
+
+thumbnail das fotos do anuncio
+
+splash screen
+
+proibir navegação pra pagina anterior. Colocar seta de voltar em todos as telas sem drawer
+
+continuar conectado
+
+navegar para anuncios list toda vez que tentar ir pra login screen mas o usuario já ta logado e verificar outras paginas que precisam do mesmo procedimento (aperte pra voltar mas já ta logado). colocar o botão de voltar nas paginas que não tem o drower.
+
+colocar uma cidade inicial. (salvar os dados da api em uma instancia do sqlite).
